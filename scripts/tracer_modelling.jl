@@ -1,3 +1,15 @@
+"""
+    tracer_modelling.jl
+
+Fits the Ogata-Banks analytical solution to the experimental bromide breakthrough curves 
+to estimate transport parameters: porosity (ϕ) and longitudinal dispersivity (αₗ).
+
+# Outputs:
+- `figs/breakthrough_fit.png`: Plot of the model fit vs experimental data.
+- `figs/breakthrough_fit.pdf`: Plot of the model fit vs experimental data in PDF format.
+- `data/processed_results/tracer_params.jld2`: Saved optimized parameters (ϕ, αₗ).
+"""
+
 using JLD2
 using CairoMakie
 using Statistics
@@ -92,6 +104,7 @@ large_fig
 
 
 save("figs/breakthrough_fit.png", large_fig)
+save("figs/breakthrough_fit.pdf", large_fig)
 
 # Save the parameters
 save("data/processed_results/tracer_params.jld2", "tracer_params", ps)

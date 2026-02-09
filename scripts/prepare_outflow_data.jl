@@ -1,3 +1,14 @@
+"""
+    prepare_outflow_data.jl
+
+Processes the raw experimental outflow data. 
+It combines data from different sheets/files (IC, Cuvette, field measurements), 
+aligns them by time, corrects for dead volumes, and creates unified datasets for each column.
+
+# Outputs:
+- `data/processed_results/outflow_data.jld2`: Saved `ds_m2` structures containing all outflow concentrations.
+"""
+
 using DataFrames
 using CSV
 using XLSX

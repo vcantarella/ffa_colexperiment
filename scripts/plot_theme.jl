@@ -1,3 +1,10 @@
+"""
+    plot_theme.jl
+
+Defines the Makie plot theme used across the project for consistent visualization.
+Sets fonts, axis styles, and legend properties.
+"""
+
 using CairoMakie
 
 # marker for columns 1:4

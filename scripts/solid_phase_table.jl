@@ -1,3 +1,14 @@
+"""
+    solid_phase_table.jl
+
+Aggregates solid-phase analysis results (Iron and TOC/TIC) for the sediment columns.
+It reads raw Excel files, cleans and unifies the data, converts percentages to molar concentrations,
+calculates mean values per column/depth, and exports the results to a CSV file.
+
+# Outputs:
+- `data/processed_results/soliphase_results.csv`: Table of solid phase concentrations (Fe, TOC, TIC).
+"""
+
 using XLSX
 using DataFrames
 using CairoMakie

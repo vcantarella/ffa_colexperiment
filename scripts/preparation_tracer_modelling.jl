@@ -1,3 +1,17 @@
+"""
+    preparation_tracer_modelling.jl
+
+Prepares the bromide tracer data for modelling. 
+It processes the raw flow rate and bromide concentration data, calculates dead volumes,
+and creates datasets for flow velocity and breakthrough curves.
+
+# Outputs:
+- `data/processed_results/bromide_flow_rate_data.jld2`: Processed flow rate data.
+- `data/processed_results/bromide_breakthrough_data.jld2`: Processed bromide breakthrough data.
+- `figs/bromide_breakthrough_prep.png`: Plot of the bromide breakthrough curves.
+- `figs/bromide_breakthrough_prep.pdf`: Plot of the bromide breakthrough curves in PDF format.
+"""
+
 using CairoMakie
 using DataFrames, XLSX, Statistics
 using Dates
@@ -118,23 +132,6 @@ Br_ = Dict(1 => Br_dict[1][.!ismissing.(Br_[1])],
             #4 => Br_dict[4][.!ismissing.(Br_[4])],
             )
 
-# Now we can plot the data
-fig = Figure()
-ax = Axis(fig[1, 1],
-    xlabel = "Time [s]",
-    ylabel = "Br⁻ [mM]",
-    title = "Bromide breakthrough curves")
-for col in 1:3
-    # get the data for the column
-    Br_col = Br_[col]
-    avg_time_col = avg_time[col]
-    # plot the data
-    #lines!(ax, df.time, df.Br, label = "Column $col")
-    scatter!(ax, avg_time_col, Br_col, label = "Column $col")
-end
-# add a legend
-axislegend(ax, position = :lt, framevisible = false)
-fig
 
 
 # save the datasets to a file

@@ -1,3 +1,15 @@
+"""
+    prepare_flow_velocity_cinflow.jl
+
+Processes the flow velocity and inflow concentration data for the model.
+It calculates the time-variable flow velocity based on flow rate measurements and
+defines the inflow concentration schedules for NO3, DOC, SO4, etc.
+
+# Outputs:
+- `data/processed_results/flow_velocity_data.jld2`: Saved `VDataA` structures.
+- `data/processed_results/inflow_data.jld2`: Saved `CinData` structures.
+"""
+
 using DataFrames, XLSX, Statistics
 using Dates
 using CairoMakie

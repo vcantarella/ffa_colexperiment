@@ -1,3 +1,14 @@
+"""
+    outflow_data_overview.jl
+
+This script generates an overview plot of the outflow concentrations for 
+Nitrate, DOC, DIC, Sulphate, and Nitrite over time for all columns.
+
+# Outputs:
+- `figs/outflow_plot.png`: The generated plot.
+- `figs/outflow_plot.pdf`: The generated plot in PDF format.
+"""
+
 using CairoMakie
 using DataFrames, Statistics
 using Dates
@@ -107,3 +118,4 @@ Legend(fig[4, :], axn, framevisible=false, merge=true, orientation = :horizontal
 resize_to_layout!(fig)
 fig
 save("figs/outflow_plot.png", fig, px_per_unit = 2.0)
+save("figs/outflow_plot.pdf", fig, pt_per_unit = 1)

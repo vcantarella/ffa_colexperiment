@@ -1,3 +1,14 @@
+"""
+    stoichiometry_reaction_analysis.jl
+
+Analyzes the stoichiometry of the denitrification reaction.
+It calculates the observed differences in Nitrate, DIC, and DOC concentrations between outflow and inflow (or control),
+and computes stoichiometric ratios (DIC/NO3, DOC/NO3, DIC/DOC) to characterize the metabolic pathway (e.g., autotrophic vs heterotrophic).
+
+# Outputs:
+- `data/processed_results/stoichiometry_dic_doc.csv`: Table of calculated stoichiometric differences and ratios.
+"""
+
 using CairoMakie
 using DataFrames, Statistics
 using Dates

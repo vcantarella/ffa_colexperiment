@@ -1,5 +1,12 @@
 
 """
+    model_data_structures.jl
+
+Defines the data structures used throughout the project for handling flow, velocity,
+inflow concentrations, and experimental datasets.
+"""
+
+"""
 QData
 structure to hold the flow rate data and corresponding end times.
 """

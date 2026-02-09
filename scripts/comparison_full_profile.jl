@@ -1,3 +1,17 @@
+"""
+    comparison_full_profile.jl
+
+This script generates a full profile comparison plot of denitrification rates, 
+organic carbon (Corg), and total sulphur (Stotal) versus depth. 
+It compares the current project data with literature values from Eschenbach et al. (2013, 2015) 
+and Weymann et al. (2010).
+
+# Outputs:
+- `figs/comparison_full_profile.png`: The generated plot.
+- `figs/comparison_full_profile.pdf`: The generated plot in PDF format.
+- `data/processed_results/no3_rates_final.csv`: Updated project data with 10°C rate estimates.
+"""
+
 using CSV
 using DataFrames
 using Statistics
@@ -236,7 +250,8 @@ zone_leg = [MarkerElement(marker = :circle, color = zone_colors[z], markersize =
 Legend(f[1, 4], [first.(dataset_leg), first.(zone_leg)], [last.(dataset_leg), last.(zone_leg)], ["Dataset", "Zone"])
 
 save("figs/comparison_full_profile.png", f)
-println("Full profile plot updated: figs/comparison_full_profile.png")
+save("figs/comparison_full_profile.pdf", f)
+println("Full profile plot updated: figs/comparison_full_profile.png and pdf")
 
 # --- Export Project Data with 10C Rates ---
 println("\n--- Exporting Updated Project Data ---")

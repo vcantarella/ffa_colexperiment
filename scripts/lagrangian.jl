@@ -19,6 +19,7 @@ using QuadGK
 using Statistics
 using CSV
 using DataFrames
+using JLD2
 include("plot_theme.jl")
 set_theme!(figtheme)
 
@@ -230,6 +231,7 @@ Legend(fig_conc[3,1], axn,
     nbanks=2, merge = true, orientation = :horizontal)
 
 save("figs/nitrate_and_rates.png", fig_conc)
+save("figs/nitrate_and_rates.pdf", fig_conc)
 
 # export the rates data
 df_export = DataFrame(
