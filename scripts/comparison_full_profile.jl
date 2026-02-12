@@ -62,7 +62,7 @@ df_project = CSV.read("data/processed_results/no3_rates.csv", DataFrame)
 for row in eachrow(df_project)
     push!(rates_rows, (
         Reference = "Current Project",
-        Zone = "Non-Sulphidic",
+        Zone = "Sulphidic",
         Depth_Mid = 17.5,
         Rate_Min = row.rate_mol_kg_d / 3.8, # Conservative Q10
         Rate_Max = row.rate_mol_kg_d / 1.4  # Optimistic Q10
@@ -75,10 +75,19 @@ for row in eachrow(df_soli)
     if !ismissing(row["TOC [mol/kg]"])
         push!(conc_rows, (
             Reference = "Current Project",
-            Zone = "Non-Sulphidic",
+            Zone = "Sulphidic",
             Depth_Mid = 17.5,
             Type = "C_org",
             Value = row["TOC [mol/kg]"]
+        ))
+    end
+    if !ismissing(row["total S [mol/kg]"])
+        push!(conc_rows, (
+            Reference = "Current Project",
+            Zone = "Sulphidic",
+            Depth_Mid = 17.5,
+            Type = "S_total",
+            Value = row["total S [mol/kg]"]
         ))
     end
 end
@@ -244,10 +253,46 @@ for row in eachrow(filter(r -> r.Type == "S_total", df_conc))
      strokewidth = strokewidth, strokecolor = strokecolor)
 end
 
+# --- Highlight Current Project Data ---
+# We add a red dashed box to highlight the location of the project data (depth ~17.5m)
+p_depth_min, p_depth_max = 17.1, 17.9
+
+# Highlight in Rates plot
+p_rates = filter(r -> r.Reference == "Current Project", df_rates)
+if !isempty(p_rates)
+    r_min = minimum([p_rates.Rate_Min; p_rates.Rate_Max])
+    r_max = maximum([p_rates.Rate_Min; p_rates.Rate_Max])
+    # Increased padding for visibility on log scale (0.5x to 2.0x)
+    poly!(ax_rates, Rect2f(r_min * 0.5, p_depth_min, r_max * 2.0 - r_min * 0.5, p_depth_max - p_depth_min),
+          color = :transparent, strokecolor = :red, strokewidth = 2.5, linestyle = :dash)
+end
+
+# Highlight in Corg plot
+p_c = filter(r -> r.Reference == "Current Project" && r.Type == "C_org", df_conc)
+if !isempty(p_c)
+    c_min, c_max = minimum(p_c.Value), maximum(p_c.Value)
+    poly!(ax_c, Rect2f(c_min * 0.8, p_depth_min, c_max * 1.2 - c_min * 0.8, p_depth_max - p_depth_min),
+          color = :transparent, strokecolor = :red, strokewidth = 2.5, linestyle = :dash)
+end
+
+# Highlight in Stotal plot
+p_s = filter(r -> r.Reference == "Current Project" && r.Type == "S_total", df_conc)
+if !isempty(p_s)
+    s_min, s_max = minimum(p_s.Value), maximum(p_s.Value)
+    # Adjusted padding for better fit on log scale (0.7x to 1.4x)
+    poly!(ax_s, Rect2f(s_min * 0.7, p_depth_min, s_max * 1.4 - s_min * 0.7, p_depth_max - p_depth_min),
+          color = :transparent, strokecolor = :red, strokewidth = 2.5, linestyle = :dash)
+end
+
 # Legends
 dataset_leg = [MarkerElement(marker = ref_markers[r], color = :black, markersize = 12) => r for r in keys(ref_markers)]
 zone_leg = [MarkerElement(marker = :circle, color = zone_colors[z], markersize = 12) => z for z in sort(collect(keys(zone_colors)))]
-Legend(f[1, 4], [first.(dataset_leg), first.(zone_leg)], [last.(dataset_leg), last.(zone_leg)], ["Dataset", "Zone"])
+highlight_leg = [PolyElement(color = :transparent, strokecolor = :red, strokewidth = 2, linestyle = :dash) => "Project data area"]
+
+Legend(f[1, 4], 
+    [first.(dataset_leg), first.(zone_leg), first.(highlight_leg)], 
+    [last.(dataset_leg), last.(zone_leg), last.(highlight_leg)], 
+    ["Dataset", "Zone", "Highlight"])
 
 save("figs/comparison_full_profile.png", f)
 save("figs/comparison_full_profile.pdf", f)

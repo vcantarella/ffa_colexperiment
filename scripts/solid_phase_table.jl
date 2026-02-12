@@ -59,17 +59,31 @@ df_toc_clean.Depth = [p !== nothing ? p.depth : missing for p in parsed_toc]
 # Filter for valid C-columns
 filter!(row -> !ismissing(row.Column), df_toc_clean)
 
+# Select data from CHNS
+file_name = "data/raw_lab_data/Fuhrberg CHNS.xlsx"
+sheet_name = "260212_Johann_KS"
+df_s = DataFrame(XLSX.readtable(file_name, sheet_name))
+df_s_clean = select(df_s, "Name", "S  [%]")
+rename!(df_s_clean, "S  [%]"=> "S%")
+parsed_s = parse_sample_name.(convert.(String, df_s.Name))
+df_s_clean.Column = [p !== nothing ? p.column : missing for p in parsed_s]
+df_s_clean.Depth = [p !== nothing ? p.depth : missing for p in parsed_s]
+# Filter for valid C-columns
+filter!(row -> !ismissing(row.Column), df_s_clean)
+
+
 # --- Unify ---
 # Join on Column and Depth
 df_joined = outerjoin(df_fe_clean, df_toc_clean, on=[:Column, :Depth], makeunique=true)
-
+df_joined = outerjoin(df_joined, df_s_clean, on=[:Column, :Depth], makeunique=true)
 # --- Process Data ---
 # 1. Convert TOC/TIC/Carbon % to mol/kg
 # 1% = 10 g/kg
 # Molar mass of C = 12.011 g/mol
 const M_C = 12.011
+const M_S = 32.065
 
-function percent_to_mol_kg(percent)
+function percent_to_mol_kg(percent, M)
     if ismissing(percent)
         return missing
     end
@@ -81,15 +95,16 @@ function percent_to_mol_kg(percent)
     end
     if ismissing(p_float) return missing end
     
-    return (p_float * 10) / M_C
+    return (p_float * 10) / M
 end
 
-df_joined[!, "TOC [mol/kg]"] = percent_to_mol_kg.(df_joined[!, "TOC%"])
-df_joined[!, "TIC [mol/kg]"] = percent_to_mol_kg.(df_joined[!, "TIC%"])
+df_joined[!, "TOC [mol/kg]"] = percent_to_mol_kg.(df_joined[!, "TOC%"], M_C)
+df_joined[!, "TIC [mol/kg]"] = percent_to_mol_kg.(df_joined[!, "TIC%"], M_C)
+df_joined[!, "total S [mol/kg]"] = percent_to_mol_kg.(df_joined[!, "S%"], M_S)
 
 # 2. Group by Column and Depth and calculate means
 # Select columns to aggregate
-cols_to_mean = ["fe2+ [mol/kg]", "fe3+ [mol/kg]", "TOC [mol/kg]", "TIC [mol/kg]"]
+cols_to_mean = ["fe2+ [mol/kg]", "fe3+ [mol/kg]", "TOC [mol/kg]", "TIC [mol/kg]", "total S [mol/kg]"]
 
 # Group and combine
 df_final = combine(groupby(df_joined, [:Column, :Depth])) do gdf
