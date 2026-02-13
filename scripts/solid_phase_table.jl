@@ -133,3 +133,12 @@ println(df_final)
 
 using CSV
 CSV.write("data/processed_results/soliphase_results.csv", df_final)
+
+# calculate ratios
+df_ratios = copy(df_final)
+df_ratios[!, "C/S"] = df_ratios[!,"TOC [mol/kg]"] ./ df_ratios[!,"total S [mol/kg]"]
+df_ratios[!, "Fe/S"] = df_ratios[!,"fe2+ [mol/kg]"] ./ df_ratios[!,"total S [mol/kg]"]
+
+# mean values
+meanC_S = mean(df_ratios[!, "C/S"])
+meanFe_S = mean(df_ratios[!, "Fe/S"])

@@ -72,24 +72,13 @@ end
 # --- 1b. Load Project Concentrations ---
 df_soli = CSV.read("data/processed_results/soliphase_results.csv", DataFrame)
 for row in eachrow(df_soli)
-    if !ismissing(row["TOC [mol/kg]"])
-        push!(conc_rows, (
-            Reference = "Current Project",
-            Zone = "Sulphidic",
-            Depth_Mid = 17.5,
-            Type = "C_org",
-            Value = row["TOC [mol/kg]"]
-        ))
-    end
-    if !ismissing(row["total S [mol/kg]"])
-        push!(conc_rows, (
-            Reference = "Current Project",
-            Zone = "Sulphidic",
-            Depth_Mid = 17.5,
-            Type = "S_total",
-            Value = row["total S [mol/kg]"]
-        ))
-    end
+    push!(conc_rows, (
+        Reference = "Current Project",
+        Zone = "Sulphidic",
+        Depth_Mid = 17.5,
+        C_org = row["TOC [mol/kg]"],
+        S_total = row["total S [mol/kg]"]
+    ))
 end
 
 # --- 2. Load Eschenbach et al. (2015) ---
@@ -128,11 +117,11 @@ for row in eachrow(df_esch)
     end
     
     # Concentrations
-    if !isnothing(col_corg_esch) && !ismissing(row[col_corg_esch])
-        push!(conc_rows, (Reference=ref, Zone=z, Depth_Mid=d_mid, Type="C_org", Value=(row[col_corg_esch] * 1e-3) / m_C))
-    end
-    if !isnothing(col_stot_esch) && !ismissing(row[col_stot_esch])
-        push!(conc_rows, (Reference=ref, Zone=z, Depth_Mid=d_mid, Type="S_total", Value=(row[col_stot_esch] * 1e-3) / m_S))
+    c_val = (!isnothing(col_corg_esch) && !ismissing(row[col_corg_esch])) ? (row[col_corg_esch] * 1e-3) / m_C : missing
+    s_val = (!isnothing(col_stot_esch) && !ismissing(row[col_stot_esch])) ? (row[col_stot_esch] * 1e-3) / m_S : missing
+    
+    if !ismissing(c_val) || !ismissing(s_val)
+        push!(conc_rows, (Reference=ref, Zone=z, Depth_Mid=d_mid, C_org=c_val, S_total=s_val))
     end
 end
 
@@ -176,11 +165,11 @@ for row in eachrow(df_wey)
     end
     
     # Concentrations
-    if !isnothing(col_corg_wey) && !ismissing(row[col_corg_wey])
-        push!(conc_rows, (Reference=ref, Zone=z, Depth_Mid=d_mid, Type="C_org", Value=(row[col_corg_wey] * 1e-3) / m_C))
-    end
-    if !isnothing(col_stot_wey) && !ismissing(row[col_stot_wey])
-        push!(conc_rows, (Reference=ref, Zone=z, Depth_Mid=d_mid, Type="S_total", Value=(row[col_stot_wey] * 1e-3) / m_S))
+    c_val = (!isnothing(col_corg_wey) && !ismissing(row[col_corg_wey])) ? (row[col_corg_wey] * 1e-3) / m_C : missing
+    s_val = (!isnothing(col_stot_wey) && !ismissing(row[col_stot_wey])) ? (row[col_stot_wey] * 1e-3) / m_S : missing
+    
+    if !ismissing(c_val) || !ismissing(s_val)
+        push!(conc_rows, (Reference=ref, Zone=z, Depth_Mid=d_mid, C_org=c_val, S_total=s_val))
     end
 end
 
@@ -236,20 +225,20 @@ for row in eachrow(df_rates)
 end
 
 # 2. Corg Plot
-for row in eachrow(filter(r -> r.Type == "C_org", df_conc))
+for row in eachrow(filter(r -> !ismissing(r.C_org), df_conc))
     c = get(zone_colors, row.Zone, :gray)
     m = get(ref_markers, row.Reference, :circle)
     msize = get(ref_markersisze, row.Reference, 16)
-    scatter!(ax_c, row.Value, row.Depth_Mid, color = c, marker = m, markersize = msize,
+    scatter!(ax_c, row.C_org, row.Depth_Mid, color = c, marker = m, markersize = msize,
      strokewidth = strokewidth, strokecolor = strokecolor)
 end
 
 # 3. Stotal Plot
-for row in eachrow(filter(r -> r.Type == "S_total", df_conc))
+for row in eachrow(filter(r -> !ismissing(r.S_total), df_conc))
     c = get(zone_colors, row.Zone, :gray)
     m = get(ref_markers, row.Reference, :circle)
     msize = get(ref_markersisze, row.Reference, 16)
-    scatter!(ax_s, row.Value, row.Depth_Mid, color = c, marker = m, markersize = msize,
+    scatter!(ax_s, row.S_total, row.Depth_Mid, color = c, marker = m, markersize = msize,
      strokewidth = strokewidth, strokecolor = strokecolor)
 end
 
@@ -268,31 +257,43 @@ if !isempty(p_rates)
 end
 
 # Highlight in Corg plot
-p_c = filter(r -> r.Reference == "Current Project" && r.Type == "C_org", df_conc)
+p_c = filter(r -> r.Reference == "Current Project" && !ismissing(r.C_org), df_conc)
 if !isempty(p_c)
-    c_min, c_max = minimum(p_c.Value), maximum(p_c.Value)
+    c_min, c_max = minimum(p_c.C_org), maximum(p_c.C_org)
     poly!(ax_c, Rect2f(c_min * 0.8, p_depth_min, c_max * 1.2 - c_min * 0.8, p_depth_max - p_depth_min),
           color = :transparent, strokecolor = :red, strokewidth = 2.5, linestyle = :dash)
 end
 
 # Highlight in Stotal plot
-p_s = filter(r -> r.Reference == "Current Project" && r.Type == "S_total", df_conc)
+p_s = filter(r -> r.Reference == "Current Project" && !ismissing(r.S_total), df_conc)
 if !isempty(p_s)
-    s_min, s_max = minimum(p_s.Value), maximum(p_s.Value)
+    s_min, s_max = minimum(p_s.S_total), maximum(p_s.S_total)
     # Adjusted padding for better fit on log scale (0.7x to 1.4x)
     poly!(ax_s, Rect2f(s_min * 0.7, p_depth_min, s_max * 1.4 - s_min * 0.7, p_depth_max - p_depth_min),
           color = :transparent, strokecolor = :red, strokewidth = 2.5, linestyle = :dash)
 end
 
 # Legends
-dataset_leg = [MarkerElement(marker = ref_markers[r], color = :black, markersize = 12) => r for r in keys(ref_markers)]
+dataset_elements = Any[]
+dataset_labels = String[]
+# Define the order explicitly for the legend
+for name in ["Current Project", "Eschenbach et al.\n (2013,2015)", "Weymann et al. (2010)"]
+    m = MarkerElement(marker = ref_markers[name], color = :black, markersize = 12)
+    if name == "Current Project"
+        # Combine marker and highlight box for the Current Project
+        push!(dataset_elements, [m, PolyElement(color = :transparent, strokecolor = :red, strokewidth = 2, linestyle = :dash)])
+    else
+        push!(dataset_elements, m)
+    end
+    push!(dataset_labels, name)
+end
+
 zone_leg = [MarkerElement(marker = :circle, color = zone_colors[z], markersize = 12) => z for z in sort(collect(keys(zone_colors)))]
-highlight_leg = [PolyElement(color = :transparent, strokecolor = :red, strokewidth = 2, linestyle = :dash) => "Project data area"]
 
 Legend(f[1, 4], 
-    [first.(dataset_leg), first.(zone_leg), first.(highlight_leg)], 
-    [last.(dataset_leg), last.(zone_leg), last.(highlight_leg)], 
-    ["Dataset", "Zone", "Highlight"])
+    [dataset_elements, first.(zone_leg)], 
+    [dataset_labels, last.(zone_leg)], 
+    ["Dataset", "Zone"])
 
 save("figs/comparison_full_profile.png", f)
 save("figs/comparison_full_profile.pdf", f)
@@ -307,3 +308,48 @@ df_project.rate_max_10C = df_project.rate_mol_kg_d ./ 1.4
 # Write back to CSV
 CSV.write("data/processed_results/no3_rates_final.csv", df_project)
 println("Updated 'data/no3_rates.csv' with 10°C rate estimates.")
+
+# --- Linear Regression: Total S vs TOC (All Data) ---
+println("\n--- Performing S-C Stoichiometry Analysis (All Data) ---")
+df_reg_all = filter(r -> !ismissing(r.C_org) && !ismissing(r.S_total), df_conc)
+
+# Extract values
+x_all = df_reg_all.C_org
+y_all = df_reg_all.S_total
+
+if length(x_all) > 1
+    m_all = cov(x_all, y_all) / var(x_all)
+    b_all = mean(y_all) - m_all * mean(x_all)
+
+    println("Equation (Combined Data): Total S = $(round(m_all, digits=4)) * TOC + $(round(b_all, digits=4))")
+
+    # --- Plotting ---
+    fig_reg = Figure(size = (600, 500))
+    ax_reg = Axis(fig_reg[1, 1], 
+        xlabel = "TOC (mol C kg⁻¹)", 
+        ylabel = "Total S (mol S kg⁻¹)",
+        title = "S-C Stoichiometry (Current Project + Literature)")
+
+    # Data points colored by Reference
+    for ref in unique(df_reg_all.Reference)
+        df_sub = filter(r -> r.Reference == ref, df_reg_all)
+        scatter!(ax_reg, df_sub.C_org, df_sub.S_total, 
+            marker = ref_markers[ref], 
+            markersize = 12, 
+            strokewidth = 1, 
+            strokecolor = :black,
+            label = ref)
+    end
+
+    # Regression line
+    x_range = range(minimum(x_all)*0.8, maximum(x_all)*1.2, length=100)
+    y_line = m_all .* x_range .+ b_all
+    lines!(ax_reg, x_range, y_line, color = :red, linewidth = 2, label = "Regression (All Data)")
+
+    axislegend(ax_reg, position = :rt, labelsize = 10)
+
+    save("figs/s_toc_regression.png", fig_reg)
+    println("Regression plot saved to figs/s_toc_regression.png")
+else
+    println("Not enough data points for combined regression.")
+end
