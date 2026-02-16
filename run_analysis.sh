@@ -26,6 +26,13 @@ julia --project=. scripts/outflow_data_overview.jl
 julia --project=. scripts/velocity_data_plot.jl
 julia --project=. scripts/comparison_full_profile.jl
 
+echo "Running biomolecular analysis (R)..."
+if command -v Rscript >/dev/null 2>&1; then
+    Rscript scripts/"Fuhrberg column analysis_Vitor.R"
+else
+    echo "Warning: Rscript not found. Skipping biomolecular analysis."
+fi
+
 # 3. Convert PDF figures to EPS
 echo "Converting PDF figures to EPS using pdftops..."
 if command -v pdftops >/dev/null 2>&1; then

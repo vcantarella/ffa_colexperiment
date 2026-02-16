@@ -27,14 +27,18 @@ The project involves four sediment columns (3 active, 1 control) subjected to va
 
 ## Requirements
 
-The project uses **Julia**. The dependencies are listed in `Project.toml`. 
+The project uses **Julia** and **R**. 
 
-**Key Packages:**
+**Julia Dependencies:**
+The dependencies are listed in `Project.toml`. 
 - `CairoMakie`: For plotting.
 - `DataFrames`, `CSV`, `XLSX`: For data manipulation.
 - `JLD2`: For saving/loading Julia data structures.
 - `DataInterpolations` / `QuadGK`: For modeling math.
 - `nonlinearlstr`: For parameter estimation: (https://github.com/vcantarella/nonlinearlstr.jl)
+
+**R Dependencies:**
+- `phyloseq`, `microeco`, `microViz`, `vegan`, `ggplot2`, and others (see `scripts/Fuhrberg column analysis_Vitor.R` for the full list).
 
 ## Usage
 
@@ -71,6 +75,7 @@ The scripts should generally be run in the following order to ensure necessary d
     - `scripts/outflow_data_overview.jl`: Plots overview of all outflow concentrations.
     - `scripts/velocity_data_plot.jl`: Plots flow velocity and discharge profiles.
     - `scripts/comparison_full_profile.jl`: Compares calculated rates with literature profiles.
+    - `scripts/Fuhrberg column analysis_Vitor.R`: Performs 16S rRNA biomolecular analysis and community composition plotting.
 
 ## Script Descriptions
 
@@ -88,6 +93,7 @@ The scripts should generally be run in the following order to ensure necessary d
 | `outflow_data_overview.jl` | Plots comprehensive time-series of outflow data. | `figs/outflow_plot.*` |
 | `velocity_data_plot.jl` | Plots flow velocity and discharge over time. | `figs/flow_velocity.*` |
 | `comparison_full_profile.jl` | Compares project rates with Eschenbach & Weymann datasets. | `no3_rates_final.csv`, `figs/comparison_full_profile.*` |
+| `Fuhrberg column analysis_Vitor.R` | Analyzes 16S rRNA sequences, diversity, and community composition. | `figs/plot_1.1.*`, `figs/pA.*`, `figs/p_heat_vals.*`, etc. |
 
 ## Data Sources
 
