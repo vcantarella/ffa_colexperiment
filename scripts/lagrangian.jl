@@ -210,7 +210,7 @@ for c in 1:3
 
     plot_t = collect(analysis_t) ./ (3600*24) # Convert to days
     lines!(axn, plot_t, c_out_values .* 1e3, # Convert to mmol/L for plot
-        label = "Column $c (Model)", color = colors[c]) 
+        label = "Column $c", color = colors[c]) 
         
     if c == 3
         lines!(axn, collect(analysis_t)./(3600*24), c_in.(analysis_t) .* 1e3, 
@@ -220,15 +220,28 @@ for c in 1:3
     # Reaction Rates
     
     scatter!(axr, valid_t ./ (24*60*60), -calculated_rates .* conv_factor, 
-        color = colors[c], markersize = 8, label = "Calc. Rate Col $c", marker = markers[c])
+        color = colors[c], markersize = 8, marker = markers[c])
     lines!(axr, valid_t ./ (24*60*60), -calculated_rates .* conv_factor, 
-        color = colors[c], label = "Calc. Rate Col $c")    
+        color = colors[c])    
     hlines!(axr, [-mean_rate * conv_factor], color = colors[c], linestyle = :dash, label = "Mean Rate Col $c")
 end
 
 # Finalize Plots
-Legend(fig_conc[3,1], axn,
-    nbanks=2, merge = true, orientation = :horizontal)
+# Finalize Plots
+plots = Any[]
+labels = String[]
+
+# Loop through both axes to extract and merge labeled plots
+for ax in [axn, axr]
+    # merge=true combines the line and scatter marker for your "Calc. Rate" entries
+    p, l = Makie.get_labeled_plots(ax, merge=true, unique=true)
+    append!(plots, p)
+    append!(labels, l)
+end
+
+# Generate the single combined legend using the extracted arrays
+Legend(fig_conc[3, 1], plots, labels,
+    nbanks=2, merge=true, orientation=:horizontal)
 
 save("figs/nitrate_and_rates.png", fig_conc)
 save("figs/nitrate_and_rates.pdf", fig_conc)
