@@ -177,7 +177,7 @@ df_rates = DataFrame(rates_rows)
 df_conc = DataFrame(conc_rows)
 
 # --- Plotting ---
-f = Figure(size = (1200, 700))
+f = Figure(size = (800, 450))
 
 # Layout: 3 Columns [Rates | Corg | S_total] + Legend
 ax_rates = Axis(f[1, 1], xlabel = "Rate (mol N kg⁻¹ d⁻¹)",
@@ -203,9 +203,9 @@ zone_colors = Dict("Non-Sulphidic" => :darkgoldenrod4,
 ref_markers = Dict("Current Project" => :circle,
                                     "Eschenbach et al.\n (2013,2015)" => :rect,
                                     "Weymann et al. (2010)" => :diamond)
-ref_markersisze = Dict("Current Project" => 19,
-                                    "Eschenbach et al.\n (2013,2015)" => 16,
-                                    "Weymann et al. (2010)" => 16)
+ref_markersisze = Dict("Current Project" => 13,
+                                    "Eschenbach et al.\n (2013,2015)" => 11,
+                                    "Weymann et al. (2010)" => 11)
 
 linewidth = 5
 strokewidth = 1.0
@@ -214,7 +214,7 @@ strokecolor = :grey21
 for row in eachrow(df_rates)
     c = get(zone_colors, row.Zone, :gray)
     m = get(ref_markers, row.Reference, :circle)
-    msize = get(ref_markersisze, row.Reference, 16)
+    msize = get(ref_markersisze, row.Reference, 11)
     # Range Bar (only if Min != Max)
     if row.Rate_Min != row.Rate_Max
         rangebars!(ax_rates, [row.Depth_Mid], [row.Rate_Min], [row.Rate_Max], direction = :x, color = (c, 0.8), linewidth = linewidth)

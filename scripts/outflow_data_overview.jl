@@ -23,8 +23,8 @@ include("model_data_structures.jl")
 L = 0.08 #m (8 cm)  # Spatial locations
 
 # First figure overview of data outflow
-fig_height = 300*3
-fig = Figure(size = (1000, fig_height))
+fig_height = 200*3
+fig = Figure(size = (600, fig_height))
 axn = Axis(fig[1:2, 1], title = "a. Nitrate",
     xlabel = "Time (days)", ylabel = "(NO₃⁻) [mmol L⁻¹]",
     yticks = 0:5e-1:2.1,
@@ -36,7 +36,7 @@ axdoc = Axis(fig[1, 2], title = "b. DOC",
     )
 axdic = Axis(fig[2, 2], title = "c. DIC",
     xlabel = "Time (days)", ylabel = "DIC [mmol L⁻¹]",
-    #yticks = 0:50:300
+    yticks = 2:.5:3.5
     )
 axso4 = Axis(fig[3, 2], title = "e. Sulphate",
     xlabel = "Time (days)", ylabel = "(SO₄²⁻) [mmol L⁻¹]",
@@ -113,9 +113,9 @@ xlims!(axdic, (4.0, 27.0))
 xlims!(axso4, (4.0, 27.0))
 xlims!(axno2, (4.0, 27.0))
 
-Legend(fig[4, :], axn, framevisible=false, merge=true, orientation = :horizontal)
+Legend(fig[4, :], axn, framevisible=false, merge=true, orientation = :horizontal, nbanks=2)
 # linkxaxes!(axn, axf, axs)
-resize_to_layout!(fig)
+#resize_to_layout!(fig)
 fig
-save("figs/outflow_plot.png", fig, px_per_unit = 2.0)
+save("figs/outflow_plot.png", fig, px_per_unit = 5)
 save("figs/outflow_plot.pdf", fig, pt_per_unit = 1)
