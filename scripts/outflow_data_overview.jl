@@ -38,7 +38,7 @@ axdic = Axis(fig[2, 2], title = "c. DIC",
     xlabel = "Time (days)", ylabel = "DIC [mmol L⁻¹]",
     yticks = 2:.5:3.5
     )
-axso4 = Axis(fig[3, 2], title = "e. Sulphate",
+axso4 = Axis(fig[3, 2], title = "e. Sulfate",
     xlabel = "Time (days)", ylabel = "(SO₄²⁻) [mmol L⁻¹]",
     #yticks = 0:2e-1:1.1
     )

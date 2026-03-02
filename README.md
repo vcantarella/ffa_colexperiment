@@ -75,6 +75,7 @@ The scripts should generally be run in the following order to ensure necessary d
     - `scripts/outflow_data_overview.jl`: Plots overview of all outflow concentrations.
     - `scripts/velocity_data_plot.jl`: Plots flow velocity and discharge profiles.
     - `scripts/comparison_full_profile.jl`: Compares calculated rates with literature profiles.
+    - `scripts/export_to_excel.jl`: Exports a consolidated and comprehensible dataset of the experiment (concentrations, flow rates, tracer data) to an Excel workbook.
     - `scripts/Fuhrberg column analysis_Vitor.R`: Performs 16S rRNA biomolecular analysis and community composition plotting.
 
 ## Script Descriptions
@@ -93,6 +94,7 @@ The scripts should generally be run in the following order to ensure necessary d
 | `outflow_data_overview.jl` | Plots comprehensive time-series of outflow data. | `figs/outflow_plot.*` |
 | `velocity_data_plot.jl` | Plots flow velocity and discharge over time. | `figs/flow_velocity.*` |
 | `comparison_full_profile.jl` | Compares project rates with Eschenbach & Weymann datasets. | `no3_rates_final.csv`, `figs/comparison_full_profile.*` |
+| `export_to_excel.jl` | Consolidates processed data into a single Excel file. | `experimental_processed_dataset.xlsx` |
 | `Fuhrberg column analysis_Vitor.R` | Analyzes 16S rRNA sequences, diversity, and community composition. | `figs/plot_1.1.*`, `figs/pA.*`, `figs/p_heat_vals.*`, etc. |
 
 ## Data Sources

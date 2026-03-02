@@ -37,11 +37,11 @@ end
 function normalize_zone(z_raw, ref_dataset)
     z = lowercase(string(z_raw))
     if occursin("weymann", lowercase(ref_dataset))
-        return occursin("autotrophic", z) ? "Sulphidic" : occursin("heterotrophic", z) ? "Non-Sulphidic" : titlecase(z)
+        return occursin("autotrophic", z) ? "Sulfidic" : occursin("heterotrophic", z) ? "Non-Sulfidic" : titlecase(z)
     end
-    return occursin("non-sulphidic", z) || occursin("non sulphidic", z) ? "Non-Sulphidic" : 
+    return occursin("non-sulphidic", z) || occursin("non sulphidic", z) ? "Non-Sulfidic" : 
            occursin("transition", z) ? "Transition Zone" : 
-           occursin("sulphidic", z) ? "Sulphidic" : titlecase(z)
+           occursin("sulphidic", z) ? "Sulfidic" : titlecase(z)
 end
 
 function get_col_robust(df, prefix)
@@ -74,7 +74,7 @@ df_soli = CSV.read("data/processed_results/soliphase_results.csv", DataFrame)
 for row in eachrow(df_soli)
     push!(conc_rows, (
         Reference = "Current Project",
-        Zone = "Sulphidic",
+        Zone = "Sulfidic",
         Depth_Mid = 17.5,
         C_org = row["TOC [mol/kg]"],
         S_total = row["total S [mol/kg]"]
@@ -188,7 +188,7 @@ ax_c = Axis(f[1, 2], xlabel = "Corg (mol C kg⁻¹)",
  yreversed = true, xscale = log10,
  titlealign = :left)
 ax_s = Axis(f[1, 3], xlabel = "Stotal (mol S kg⁻¹)",
- title = "c. Total Sulphur",
+ title = "c. Total Sulfur",
   yreversed = true, xscale = log10,
   titlealign = :left)
 
@@ -197,8 +197,8 @@ hideydecorations!(ax_c, grid = false)
 hideydecorations!(ax_s, grid = false)
 
 # Styling
-zone_colors = Dict("Non-Sulphidic" => :darkgoldenrod4,
-                                    "Sulphidic" => :gold1,
+zone_colors = Dict("Non-Sulfidic" => :darkgoldenrod4,
+                                    "Sulfidic" => :gold1,
                                     "Transition Zone" => :darkkhaki)
 ref_markers = Dict("Current Project" => :circle,
                                     "Eschenbach et al.\n (2013,2015)" => :rect,

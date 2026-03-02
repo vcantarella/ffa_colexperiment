@@ -25,6 +25,7 @@ echo "Generating overview and comparison plots..."
 julia --project=. scripts/outflow_data_overview.jl
 julia --project=. scripts/velocity_data_plot.jl
 julia --project=. scripts/comparison_full_profile.jl
+julia --project=. scripts/export_to_excel.jl
 
 echo "Running biomolecular analysis (R)..."
 if command -v Rscript >/dev/null 2>&1; then

@@ -153,7 +153,7 @@ fig = Figure(size = (700, fig_height))
 axtoc = Axis(fig[1, 1], title = "a. TOC",
     ylabel = "TOC [mol kg⁻¹]",
     )
-axs = Axis(fig[1, 2], title = "b. total Sulphur",
+axs = Axis(fig[1, 2], title = "b. total Sulfur",
     ylabel = "total S [mol kg⁻¹]",
     #yticks = 0:50:300
     )

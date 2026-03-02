@@ -109,14 +109,14 @@ end
 
 # Figure 1: Nitrate Output and Reaction Rates
 fig_conc = Figure(size = (500, 500))
-axn = Axis(fig_conc[1, 1], 
-    title = "a. Nitrate Outflows",
+axn = Axis(fig_conc[2, 1], 
+    title = "b. Nitrate Outflows",
     ylabel = "NO₃⁻ [mmol L⁻¹]",
     yticks = 0:0.5:2.5,
     xticks = 5:5:28
 )
-axr = Axis(fig_conc[2, 1],
-    title = "b. Estimated Reaction Rates",
+axr = Axis(fig_conc[1, 1],
+    title = "a. Estimated Reaction Rates",
     ylabel = "Rate [mmol L⁻¹ day⁻¹]",
     xlabel = "Time [days]",
     xticks = 5:5:28,
