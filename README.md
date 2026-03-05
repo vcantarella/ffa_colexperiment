@@ -18,7 +18,7 @@ The project involves four sediment columns (3 active, 1 control) subjected to va
 ├── data/
 │   ├── external/              # Literature data (Eschenbach et al., Weymann et al.)
 │   ├── raw_lab_data/          # Raw experimental data (Excel, CSV)
-│   └── processed_results/     # Generated intermediate data files (.jld2, .csv)
+│   └── processed_results/     # Generated intermediate and analysis ready data files (.jld2, .csv)
 ├── figs/                      # Generated figures (PNG, PDF)
 ├── scripts/                   # Julia analysis scripts
 ├── Project.toml               # Julia project dependencies
@@ -73,6 +73,7 @@ The scripts should generally be run in the following order to ensure necessary d
 
 3.  **Visualization & Comparison:**
     - `scripts/outflow_data_overview.jl`: Plots overview of all outflow concentrations.
+    - `scripts/ph_ec_plot.jl`: Plots pH and Electrical Conductivity (EC) time-series.
     - `scripts/velocity_data_plot.jl`: Plots flow velocity and discharge profiles.
     - `scripts/comparison_full_profile.jl`: Compares calculated rates with literature profiles.
     - `scripts/export_to_excel.jl`: Exports a consolidated and comprehensible dataset of the experiment (concentrations, flow rates, tracer data) to an Excel workbook.
@@ -92,6 +93,7 @@ The scripts should generally be run in the following order to ensure necessary d
 | `lagrangian.jl` | Main simulation: calculates residence times and reaction rates. | `no3_rates.csv`, `figs/nitrate_and_rates.*` |
 | `stoichiometry_reaction_analysis.jl` | Calculates stoichiometric ratios for reaction characterization. | `stoichiometry_dic_doc.csv` |
 | `outflow_data_overview.jl` | Plots comprehensive time-series of outflow data. | `figs/outflow_plot.*` |
+| `ph_ec_plot.jl` | Plots pH and Electrical Conductivity (EC) over time. | `figs/ph_ec_plot.*` |
 | `velocity_data_plot.jl` | Plots flow velocity and discharge over time. | `figs/flow_velocity.*` |
 | `comparison_full_profile.jl` | Compares project rates with Eschenbach & Weymann datasets. | `no3_rates_final.csv`, `figs/comparison_full_profile.*` |
 | `export_to_excel.jl` | Consolidates processed data into a single Excel file. | `experimental_processed_dataset.xlsx` |

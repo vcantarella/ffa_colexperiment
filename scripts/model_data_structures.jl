@@ -94,6 +94,6 @@ struct ds_m2{I, D}
     dic::D
     no2::D
     so4::D
-    #pH::D
-    #ec::D
+    pH::D
+    ec::D
 end

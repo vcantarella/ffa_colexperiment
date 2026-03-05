@@ -108,3 +108,20 @@ save("figs/breakthrough_fit.pdf", large_fig)
 
 # Save the parameters
 save("data/processed_results/tracer_params.jld2", "tracer_params", ps)
+
+# Export a CSV table for Word
+using DataFrames
+using CSV
+df_params = DataFrame(
+    Column = Int[],
+    Porosity = Float64[],
+    Dispersivity_mm = Float64[]
+)
+
+for col in sort(collect(keys(ps)))
+    push!(df_params, (col, ps[col][1], ps[col][2] * 1000))
+end
+
+CSV.write("data/processed_results/tracer_parameters_table.csv", df_params)
+
+println("Tracer parameters exported to data/processed_results/tracer_parameters_table.csv")

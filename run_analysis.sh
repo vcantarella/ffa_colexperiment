@@ -23,6 +23,7 @@ julia --project=. scripts/stoichiometry_reaction_analysis.jl
 
 echo "Generating overview and comparison plots..."
 julia --project=. scripts/outflow_data_overview.jl
+julia --project=. scripts/ph_ec_plot.jl
 julia --project=. scripts/velocity_data_plot.jl
 julia --project=. scripts/comparison_full_profile.jl
 julia --project=. scripts/export_to_excel.jl

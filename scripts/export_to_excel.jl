@@ -33,6 +33,8 @@ for col_id in sort(collect(keys(all_ds)))
     append!(df_outflow, extract_conc(d.dic, "DIC", col_id))
     append!(df_outflow, extract_conc(d.no2, "NO2", col_id))
     append!(df_outflow, extract_conc(d.so4, "SO4", col_id))
+    append!(df_outflow, extract_conc(d.pH, "pH", col_id))
+    append!(df_outflow, extract_conc(d.ec, "EC", col_id))
 end
 
 # 2. Load Bromide Tracer Data
@@ -68,7 +70,7 @@ end
 # 4. Create Metadata/Comments Sheet
 metadata = [
     "Sheet" "Description" "Units / Comments";
-    "Outflow_Concentrations" "Processed concentrations of NO3, NO2, SO4, DOC, DIC" "Time in seconds since t0; Concentrations in mM (corrected for dead volume)";
+    "Outflow_Concentrations" "Processed concentrations of NO3, NO2, SO4, DOC, DIC, pH, EC" "Time in seconds since t0; Concentrations in mM (corrected for dead volume); pH (unitless); EC (μS/cm)";
     "Bromide_Tracer" "Breakthrough curve data for Bromide" "Time in seconds since t0; Concentration in mM";
     "Flow_Rates" "Measured flow rates during the experiment" "Flow rate in cm³/s; Times in seconds since t0";
     "General_Note" "This dataset contains the processed and corrected results from the column experiments." "t0 is the start of the experiment for each column (corrected for inflow dead volume)."

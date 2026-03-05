@@ -85,8 +85,10 @@ for i in 1:4
     dic_ds = conc_ds(convert.(Float64, dic[.!ismissing.(dic)]), df_cp[cp_index,"t"][.!ismissing.(dic)])
     no2_col = conc_ds(convert.(Float64, no2[id1][.!ismissing.(no2[id1])]), avg_times_dict[i][.!ismissing.(no2[id1])])
     so4_col = conc_ds(convert.(Float64, so4[id1][.!ismissing.(so4[id1])]./96), avg_times_dict[i][.!ismissing.(so4[id1])])
+    pH_col = conc_ds(convert.(Float64, pH[id1][.!ismissing.(pH[id1])]), avg_times_dict[i][.!ismissing.(pH[id1])])
+    ec_col = conc_ds(convert.(Float64, ec[id1][.!ismissing.(ec[id1])]), avg_times_dict[i][.!ismissing.(ec[id1])])
     # create a dataset for the column
-    col_ds = ds_m2(i, no3_ds, doc_ds, dic_ds, no2_col, so4_col)
+    col_ds = ds_m2(i, no3_ds, doc_ds, dic_ds, no2_col, so4_col, pH_col, ec_col)
     all_ds[i] = col_ds
     # save the dataset to a file
     
