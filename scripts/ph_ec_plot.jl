@@ -19,7 +19,7 @@ include("model_data_structures.jl")
 
 @load "data/processed_results/outflow_data.jld2"
 
-fig = Figure(size = (560, 450))
+fig = Figure(size = (238, 350))
 axph = Axis(fig[1, 1], title = "a. pH",
     xlabel = "Time (days)", ylabel = "pH",
     xticks = 5:5:28
@@ -49,9 +49,9 @@ end
 xlims!(axph, (4.0, 27.0))
 xlims!(axec, (4.0, 27.0))
 
-Legend(fig[3, :], axph, framevisible=false, merge=true, orientation = :horizontal)
+Legend(fig[3, :], axph, framevisible=false, merge=true, orientation = :horizontal, nbanks=2)
 
-save("figs/ph_ec_plot.png", fig, px_per_unit = 5)
+save("figs/ph_ec_plot.png", fig, px_per_unit = 8.33)
 save("figs/ph_ec_plot.pdf", fig, pt_per_unit = 1)
 
 println("pH and EC plot generated.")

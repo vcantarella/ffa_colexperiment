@@ -148,8 +148,7 @@ meanC_S = mean(df_ratios[!, "C/S"])
 meanFe_S = mean(df_ratios[!, "Fe/S"])
 
 # Plot results in a Figure.
-fig_height = 600
-fig = Figure(size = (700, fig_height))
+fig = Figure(size = (493, 422))
 axtoc = Axis(fig[1, 1], title = "a. TOC",
     ylabel = "TOC [mol kg⁻¹]",
     )
@@ -218,5 +217,5 @@ autolimits!.(all_axes) # Ensures the view matches the data
 display(fig)
 
 fig
-save("figs/solid_phase_barplots.png", fig, px_per_unit = 2)
+save("figs/solid_phase_barplots.png", fig, px_per_unit = 8.33)
 save("figs/solid_phase_barplots.pdf", fig, pt_per_unit = 1)

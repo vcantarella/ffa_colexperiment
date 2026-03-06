@@ -65,7 +65,7 @@ ps = Dict(
     # 4 => [ϕ, αₗ],
 )
 
-large_fig = Figure()
+large_fig = Figure(size=(366, 300))
 large_ax = Axis(large_fig[1, 1],
     xlabel = "time from injection (hr)",
     ylabel = "bromide concentration (mmol L⁻¹)",
@@ -103,8 +103,8 @@ resize_to_layout!(large_fig)
 large_fig
 
 
-save("figs/breakthrough_fit.png", large_fig)
-save("figs/breakthrough_fit.pdf", large_fig)
+save("figs/breakthrough_fit.png", large_fig, px_per_unit = 8.33)
+save("figs/breakthrough_fit.pdf", large_fig, pt_per_unit=1)
 
 # Save the parameters
 save("data/processed_results/tracer_params.jld2", "tracer_params", ps)

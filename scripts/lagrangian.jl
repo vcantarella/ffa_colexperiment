@@ -108,7 +108,7 @@ end
 # --- Simulation & Plotting ---
 
 # Figure 1: Nitrate Output and Reaction Rates
-fig_conc = Figure(size = (500, 500))
+fig_conc = Figure(size = (366, 366))
 axn = Axis(fig_conc[2, 1], 
     title = "b. Nitrate Outflows",
     ylabel = "NO₃⁻ [mmol L⁻¹]",

@@ -4,7 +4,7 @@
 This script generates a full profile comparison plot of denitrification rates, 
 organic carbon (Corg), and total sulphur (Stotal) versus depth. 
 It compares the current project data with literature values from Eschenbach et al. (2013, 2015) 
-and Weymann et al. (2010).
+and Weymann et al.\n (2010).
 
 # Outputs:
 - `figs/comparison_full_profile.png`: The generated plot.
@@ -62,7 +62,7 @@ df_project = CSV.read("data/processed_results/no3_rates.csv", DataFrame)
 for row in eachrow(df_project)
     push!(rates_rows, (
         Reference = "Current Project",
-        Zone = "Sulphidic",
+        Zone = "Sulfidic",
         Depth_Mid = 17.5,
         Rate_Min = row.rate_mol_kg_d / 3.8, # Conservative Q10
         Rate_Max = row.rate_mol_kg_d / 1.4  # Optimistic Q10
@@ -125,7 +125,7 @@ for row in eachrow(df_esch)
     end
 end
 
-# --- 3. Load Weymann et al. (2010) ---
+# --- 3. Load Weymann et al.\n (2010) ---
 df_wey = CSV.read("data/external/weymann_et_al_2010.csv", DataFrame)
 # Strict column finding for Weymann to avoid partial matches
 cols_di = [n for n in names(df_wey) if startswith(n, "Di") || startswith(n, "Di\u200b")]
@@ -142,7 +142,7 @@ for row in eachrow(df_wey)
     ismissing(d_mid) && continue
     
     z = normalize_zone(row["Zone"], "Weymann")
-    ref = "Weymann et al. (2010)"
+    ref = "Weymann et al.\n (2010)"
     
     # Rates
     available_rates = Float64[]
@@ -177,7 +177,7 @@ df_rates = DataFrame(rates_rows)
 df_conc = DataFrame(conc_rows)
 
 # --- Plotting ---
-f = Figure(size = (800, 450))
+f = Figure(size = (493, 320))
 
 # Layout: 3 Columns [Rates | Corg | S_total] + Legend
 ax_rates = Axis(f[1, 1], xlabel = "Rate (mol N kg⁻¹ d⁻¹)",
@@ -202,19 +202,19 @@ zone_colors = Dict("Non-Sulfidic" => :darkgoldenrod4,
                                     "Transition Zone" => :darkkhaki)
 ref_markers = Dict("Current Project" => :circle,
                                     "Eschenbach et al.\n (2013,2015)" => :rect,
-                                    "Weymann et al. (2010)" => :diamond)
-ref_markersisze = Dict("Current Project" => 13,
-                                    "Eschenbach et al.\n (2013,2015)" => 11,
-                                    "Weymann et al. (2010)" => 11)
+                                    "Weymann et al.\n (2010)" => :diamond)
+ref_markersisze = Dict("Current Project" => 9,
+                                    "Eschenbach et al.\n (2013,2015)" => 8,
+                                    "Weymann et al.\n (2010)" => 8)
 
-linewidth = 5
-strokewidth = 1.0
+linewidth = 2.8
+strokewidth = .7
 strokecolor = :grey21 
 # 1. Rates Plot
 for row in eachrow(df_rates)
     c = get(zone_colors, row.Zone, :gray)
     m = get(ref_markers, row.Reference, :circle)
-    msize = get(ref_markersisze, row.Reference, 11)
+    msize = get(ref_markersisze, row.Reference, 9)
     # Range Bar (only if Min != Max)
     if row.Rate_Min != row.Rate_Max
         rangebars!(ax_rates, [row.Depth_Mid], [row.Rate_Min], [row.Rate_Max], direction = :x, color = (c, 0.8), linewidth = linewidth)
@@ -228,7 +228,7 @@ end
 for row in eachrow(filter(r -> !ismissing(r.C_org), df_conc))
     c = get(zone_colors, row.Zone, :gray)
     m = get(ref_markers, row.Reference, :circle)
-    msize = get(ref_markersisze, row.Reference, 16)
+    msize = get(ref_markersisze, row.Reference, 9)
     scatter!(ax_c, row.C_org, row.Depth_Mid, color = c, marker = m, markersize = msize,
      strokewidth = strokewidth, strokecolor = strokecolor)
 end
@@ -237,7 +237,7 @@ end
 for row in eachrow(filter(r -> !ismissing(r.S_total), df_conc))
     c = get(zone_colors, row.Zone, :gray)
     m = get(ref_markers, row.Reference, :circle)
-    msize = get(ref_markersisze, row.Reference, 16)
+    msize = get(ref_markersisze, row.Reference, 9)
     scatter!(ax_s, row.S_total, row.Depth_Mid, color = c, marker = m, markersize = msize,
      strokewidth = strokewidth, strokecolor = strokecolor)
 end
@@ -253,7 +253,7 @@ if !isempty(p_rates)
     r_max = maximum([p_rates.Rate_Min; p_rates.Rate_Max])
     # Increased padding for visibility on log scale (0.5x to 2.0x)
     poly!(ax_rates, Rect2f(r_min * 0.5, p_depth_min, r_max * 2.0 - r_min * 0.5, p_depth_max - p_depth_min),
-          color = :transparent, strokecolor = :red, strokewidth = 2.5, linestyle = :dash)
+          color = :transparent, strokecolor = :red, strokewidth = 1.5, linestyle = :dash)
 end
 
 # Highlight in Corg plot
@@ -261,7 +261,7 @@ p_c = filter(r -> r.Reference == "Current Project" && !ismissing(r.C_org), df_co
 if !isempty(p_c)
     c_min, c_max = minimum(p_c.C_org), maximum(p_c.C_org)
     poly!(ax_c, Rect2f(c_min * 0.8, p_depth_min, c_max * 1.2 - c_min * 0.8, p_depth_max - p_depth_min),
-          color = :transparent, strokecolor = :red, strokewidth = 2.5, linestyle = :dash)
+          color = :transparent, strokecolor = :red, strokewidth = 1.5, linestyle = :dash)
 end
 
 # Highlight in Stotal plot
@@ -270,33 +270,36 @@ if !isempty(p_s)
     s_min, s_max = minimum(p_s.S_total), maximum(p_s.S_total)
     # Adjusted padding for better fit on log scale (0.7x to 1.4x)
     poly!(ax_s, Rect2f(s_min * 0.7, p_depth_min, s_max * 1.4 - s_min * 0.7, p_depth_max - p_depth_min),
-          color = :transparent, strokecolor = :red, strokewidth = 2.5, linestyle = :dash)
+          color = :transparent, strokecolor = :red, strokewidth = 1.5, linestyle = :dash)
 end
 
 # Legends
 dataset_elements = Any[]
 dataset_labels = String[]
 # Define the order explicitly for the legend
-for name in ["Current Project", "Eschenbach et al.\n (2013,2015)", "Weymann et al. (2010)"]
-    m = MarkerElement(marker = ref_markers[name], color = :black, markersize = 12)
+for name in ["Current Project", "Eschenbach et al.\n (2013,2015)", "Weymann et al.\n (2010)"]
+    m = MarkerElement(marker = ref_markers[name], color = :black, markersize = 7)
     if name == "Current Project"
         # Combine marker and highlight box for the Current Project
-        push!(dataset_elements, [m, PolyElement(color = :transparent, strokecolor = :red, strokewidth = 2, linestyle = :dash)])
+        push!(dataset_elements, [m, PolyElement(color = :transparent, strokecolor = :red, strokewidth = 1, linestyle = :dash)])
     else
         push!(dataset_elements, m)
     end
     push!(dataset_labels, name)
 end
 
-zone_leg = [MarkerElement(marker = :circle, color = zone_colors[z], markersize = 12) => z for z in sort(collect(keys(zone_colors)))]
+zone_leg = [MarkerElement(marker = :circle, color = zone_colors[z], markersize = 7) => z for z in sort(collect(keys(zone_colors)))]
 
 Legend(f[1, 4], 
     [dataset_elements, first.(zone_leg)], 
     [dataset_labels, last.(zone_leg)], 
-    ["Dataset", "Zone"])
+    ["Dataset", "Zone"],
+    labelsize = 8, titlesize = 9, patchsize = (12, 12), 
+    rowgap = 1, groupgap = 4, framevisible = false)
+colsize!(f.layout, 4, Fixed(60))
 
-save("figs/comparison_full_profile.png", f)
-save("figs/comparison_full_profile.pdf", f)
+save("figs/comparison_full_profile.png", f, px_per_unit = 8.33)
+save("figs/comparison_full_profile.pdf", f, pt_per_unit = 1)
 println("Full profile plot updated: figs/comparison_full_profile.png and pdf")
 
 # --- Export Project Data with 10C Rates ---

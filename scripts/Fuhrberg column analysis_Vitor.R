@@ -1,5 +1,16 @@
 #16S rRNA analysis for Vitor's column experiment
 
+# Ensure a writable user-specific library exists and is added to .libPaths()
+# This avoids "lib is not writable" errors when installing packages on Windows
+user_lib <- Sys.getenv("R_LIBS_USER")
+if (user_lib == "" || !dir.exists(user_lib)) {
+  user_lib <- file.path(Sys.getenv("USERPROFILE"), "Documents", "R", "win-library", "4.5")
+}
+if (!dir.exists(user_lib)) {
+  dir.create(user_lib, recursive = TRUE, showWarnings = FALSE)
+}
+.libPaths(c(user_lib, .libPaths()))
+
 #Load packages
 # Set CRAN mirror to avoid interactive prompt
 options(repos = c(CRAN = "https://cloud.r-project.org"))
@@ -891,38 +902,43 @@ p_beta_pcoa
 
 #### SAVE PLOTS ####
 
-# plot_1.1
-ggsave("figs/plot_1.1.png", plot = plot_1.1, width = 10, height = 8)
-ggsave("figs/plot_1.1.pdf", plot = plot_1.1, width = 10, height = 8)
+# plot_1.1 (Double column width)
+ggsave("figs/plot_1.1.png", plot = plot_1.1, width = 174, height = 140, units = "mm", dpi = 600)
+ggsave("figs/plot_1.1.pdf", plot = plot_1.1, width = 174, height = 140, units = "mm")
+#ggsave("figs/plot_1.1.eps", plot = plot_1.1, width = 174, height = 140, units = "mm") # Recommended format
 
-# plot_1.2
-ggsave("figs/plot_1.2.png", plot = plot_1.2, width = 10, height = 8)
-ggsave("figs/plot_1.2.pdf", plot = plot_1.2, width = 10, height = 8)
+# plot_1.2 (Double column width)
+ggsave("figs/plot_1.2.png", plot = plot_1.2, width = 174, height = 140, units = "mm", dpi = 600)
+ggsave("figs/plot_1.2.pdf", plot = plot_1.2, width = 174, height = 140, units = "mm")
+#ggsave("figs/plot_1.2.eps", plot = plot_1.2, width = 174, height = 140, units = "mm")
 
-# plot_fuhrberg
-ggsave("figs/plot_fuhrberg.png", plot = plot_fuhrberg, width = 10, height = 8)
-ggsave("figs/plot_fuhrberg.pdf", plot = plot_fuhrberg, width = 10, height = 8)
+# plot_fuhrberg (Double column width)
+ggsave("figs/plot_fuhrberg.png", plot = plot_fuhrberg, width = 174, height = 140, units = "mm", dpi = 600)
+ggsave("figs/plot_fuhrberg.pdf", plot = plot_fuhrberg, width = 174, height = 140, units = "mm")
+#ggsave("figs/plot_fuhrberg.eps", plot = plot_fuhrberg, width = 174, height = 140, units = "mm")
 
-# pA
-ggsave("figs/pA.png", plot = pA, width = 10, height = 8)
-ggsave("figs/pA.pdf", plot = pA, width = 10, height = 8)
+# pA (Double column width)
+ggsave("figs/pA.png", plot = pA, width = 174, height = 140, units = "mm", dpi = 600)
+ggsave("figs/pA.pdf", plot = pA, width = 174, height = 140, units = "mm")
+#ggsave("figs/pA.eps", plot = pA, width = 174, height = 140, units = "mm")
 
-# pB
-ggsave("figs/pB.png", plot = pB, width = 12, height = 8)
-ggsave("figs/pB.pdf", plot = pB, width = 12, height = 8)
+# pB (Double column width - slightly shorter to accommodate aspect ratio)
+ggsave("figs/pB.png", plot = pB, width = 174, height = 120, units = "mm", dpi = 600)
+ggsave("figs/pB.pdf", plot = pB, width = 174, height = 120, units = "mm")
+#ggsave("figs/pB.eps", plot = pB, width = 174, height = 120, units = "mm")
 
 # p_heat_vals
-# Saved with high quality (300 dpi) and specified dimensions (max 174mm width)
-# 174 mm = 6.85 inches
-# 234 mm = 9.21 inches
-ggsave("figs/p_heat_vals.png", plot = p_heat_vals, width = 6.85, height = 9, dpi = 300)
-ggsave("figs/p_heat_vals.pdf", plot = p_heat_vals, width = 6.85, height = 9)
+# Max 174mm width, max height 234mm. Set to 228mm (~9 inches).
+ggsave("figs/p_heat_vals.png", plot = p_heat_vals, width = 174, height = 228, units = "mm", dpi = 600)
+ggsave("figs/p_heat_vals.pdf", plot = p_heat_vals, width = 174, height = 228, units = "mm")
+#ggsave("figs/p_heat_vals.eps", plot = p_heat_vals, width = 174, height = 228, units = "mm")
 
-# p_alpha
-ggsave("figs/p_alpha.png", plot = p_alpha, width = 10, height = 6)
-ggsave("figs/p_alpha.pdf", plot = p_alpha, width = 10, height = 6)
+# p_alpha (Double column width, shorter height)
+ggsave("figs/p_alpha.png", plot = p_alpha, width = 174, height = 100, units = "mm", dpi = 600)
+ggsave("figs/p_alpha.pdf", plot = p_alpha, width = 174, height = 100, units = "mm")
+#ggsave("figs/p_alpha.eps", plot = p_alpha, width = 174, height = 100, units = "mm")
 
-# p_beta_pcoa
-ggsave("figs/p_beta_pcoa.png", plot = p_beta_pcoa, width = 8, height = 6)
-ggsave("figs/p_beta_pcoa.pdf", plot = p_beta_pcoa, width = 8, height = 6)
-
+# p_beta_pcoa (1.5 column width since it's a simpler scatter plot)
+ggsave("figs/p_beta_pcoa.png", plot = p_beta_pcoa, width = 129, height = 100, units = "mm", dpi = 600)
+ggsave("figs/p_beta_pcoa.pdf", plot = p_beta_pcoa, width = 129, height = 100, units = "mm")
+#ggsave("figs/p_beta_pcoa.eps", plot = p_beta_pcoa, width = 129, height = 100, units = "mm")

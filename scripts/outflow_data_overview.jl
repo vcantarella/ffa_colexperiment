@@ -24,7 +24,7 @@ L = 0.08 #m (8 cm)  # Spatial locations
 
 # First figure overview of data outflow
 fig_height = 200*3
-fig = Figure(size = (600, fig_height))
+fig = Figure(size = (493, 530))
 axn = Axis(fig[1:2, 1], title = "a. Nitrate",
     xlabel = "Time (days)", ylabel = "(NO₃⁻) [mmol L⁻¹]",
     yticks = 0:5e-1:2.1,
@@ -117,5 +117,5 @@ Legend(fig[4, :], axn, framevisible=false, merge=true, orientation = :horizontal
 # linkxaxes!(axn, axf, axs)
 #resize_to_layout!(fig)
 fig
-save("figs/outflow_plot.png", fig, px_per_unit = 5)
+save("figs/outflow_plot.png", fig, px_per_unit = 8.33)
 save("figs/outflow_plot.pdf", fig, pt_per_unit = 1)

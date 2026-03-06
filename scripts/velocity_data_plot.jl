@@ -29,7 +29,7 @@ k_conv = (ϕ_avg * A * 1e6 / 24)
 
 
 # Second figure: overview of velocity and discharge data.
-fig2 = Figure(size = (400, 300))
+fig2 = Figure(size = (366, 300))
 axv2 = Axis(fig2[1, 1], title = "Flow velocity",
     xlabel = "Time (days)", ylabel = "Velocity [m day⁻¹]",
     xticks = 5:5:28,
@@ -87,5 +87,5 @@ Legend(fig2[2, :], axv2, merge=true, orientation = :horizontal)
 
 resize_to_layout!(fig2)
 fig2
-save("figs/flow_velocity.png", fig2, px_per_unit = 2.0)
+save("figs/flow_velocity.png", fig2, px_per_unit = 8.33)
 save("figs/flow_velocity.pdf", fig2, pt_per_unit = 1)

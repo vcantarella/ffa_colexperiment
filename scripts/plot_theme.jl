@@ -19,24 +19,27 @@ figtheme = Theme(
     ),
     Axis = (
         titlealign = :left,
-        titlesize = 13,
-        xlabelsize = 12,
-        ylabelsize = 12,
-        xticklabelsize = 11,
-        yticklabelsize = 11,
-        xticksize = 9,
-        yticksize = 9,
+        titlesize = 10,
+        xlabelsize = 9,
+        ylabelsize = 9,
+        xticklabelsize = 8,
+        yticklabelsize = 8,
+        xticksize = 7,
+        yticksize = 7,
         topspinevisible = false,
         rightspinevisible = false,
-        spinewidth = 1.7,
+        spinewidth = 1.2,
     ),
     Legend = (
-        titlesize = 12,
+        titlesize = 8,
         titlehalign = :left,
-        labelsize = 12,
+        labelsize = 9,
         framevisible = false,
         rowgap = 1,
-        colgap = 9,
+        colgap = 8,             # Space between items in horizontal layout
+        patchlabelgap = 2,      # Space between marker and text
+        patchsize = (10, 10),   # Smaller markers/lines in legend
+        padding = (2, 2, 2, 2), # Minimal internal padding
     )
 
 )
