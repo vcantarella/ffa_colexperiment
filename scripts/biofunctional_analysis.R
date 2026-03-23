@@ -1,7 +1,7 @@
-#16S rRNA analysis for Vitor's column experiment
+# 16S rRNA analysis for Vitor's column experiment
 
+# --- ENVIRONMENT SETUP ---
 # Ensure a writable user-specific library exists and is added to .libPaths()
-# This avoids "lib is not writable" errors when installing packages on Windows
 user_lib <- Sys.getenv("R_LIBS_USER")
 if (user_lib == "" || !dir.exists(user_lib)) {
   user_lib <- file.path(Sys.getenv("USERPROFILE"), "Documents", "R", "win-library", "4.5")
@@ -11,20 +11,19 @@ if (!dir.exists(user_lib)) {
 }
 .libPaths(c(user_lib, .libPaths()))
 
-#Load packages
 # Set CRAN mirror to avoid interactive prompt
 options(repos = c(CRAN = "https://cloud.r-project.org"))
 
-if (!require("BiocManager", quietly = TRUE))
-  install.packages("BiocManager")
+# --- PACKAGE INSTALLATION ---
+if (!require("BiocManager", quietly = TRUE)) install.packages("BiocManager")
 
 # Fix rbibutils if needed (for FSA)
 if (requireNamespace("rbibutils", quietly = TRUE)) {
-    if (packageVersion("rbibutils") < "2.4.1") {
-        BiocManager::install("rbibutils", update = TRUE, ask = FALSE, force = TRUE)
-    }
+  if (packageVersion("rbibutils") < "2.4.1") {
+    BiocManager::install("rbibutils", update = TRUE, ask = FALSE, force = TRUE)
+  }
 } else {
-    BiocManager::install("rbibutils", update = FALSE, ask = FALSE)
+  BiocManager::install("rbibutils", update = FALSE, ask = FALSE)
 }
 
 # Install microViz specially
@@ -32,7 +31,7 @@ if (!requireNamespace("microViz", quietly = TRUE)) {
   install.packages("microViz", repos = c(davidbarnett = "https://david-barnett.r-universe.dev", getOption("repos")))
 }
 
-# Helper to install
+# Helper to install missing packages
 install_if_missing <- function(pkg) {
   if (!requireNamespace(pkg, quietly = TRUE)) {
     tryCatch({
@@ -43,50 +42,76 @@ install_if_missing <- function(pkg) {
   }
 }
 
-# List of packages
-pkgs <- c("DECIPHER", "phytools", "lubridate", "microeco", 
-          "phangorn", "DESeq2", "FSA", 
-          "rcompanion", "ggsci", "microbiome", "phyloseq",
-          "picante", "vegan", "ape", "nlme", "ggplot2", 
-          "reshape2", "tidyverse", "RColorBrewer", "patchwork", 
-          "file2meco", "GUniFrac", "hillR", "ggridges", "tibble", "scales",
-          "decontam", "ggpubr")
+pkgs <- c("DECIPHER", "phytools", "lubridate", "microeco", "phangorn", "DESeq2", 
+          "FSA", "rcompanion", "ggsci", "microbiome", "phyloseq", "picante", 
+          "vegan", "ape", "nlme", "ggplot2", "reshape2", "tidyverse", 
+          "RColorBrewer", "patchwork", "file2meco", "GUniFrac", "hillR", 
+          "ggridges", "tibble", "scales", "decontam", "ggpubr", "knitr", "dplyr")
 
 for (pkg in pkgs) {
   install_if_missing(pkg)
 }
 
-
-library(vegan)        # ecological functions
-library(picante)      # ecological functions
-library(ape)          # phylogenetic functions
+# --- LOAD LIBRARIES ---
+library(vegan)
+library(picante)
+library(ape)
 library(nlme)
-library(ggplot2)      # plotting package
-library(reshape2)     # data manipulation
-library(tidyverse)    # data manipulation
-library(phytools)     # phylogenetic functions
-library(phyloseq)     # microbial analyses
-library(RColorBrewer) # plotting package
-library(microbiome)   # microbial analyses
-library(microeco)     # microbial analyses
-library(microViz)     # microbial analyses
-library(DECIPHER)     # phylogenetic functions
-library(phangorn)     # phylogenetic functions
-library(decontam)     # decontamination
-library(patchwork)    # plotting package
-library(file2meco)    # switching between micro packages
-library(DESeq2)       # normalization
-library(picante)      # phylogenetic diversity
-library(GUniFrac)     # phylogenetic diversity
-library(hillR)        # hill numbers
-library(FSA)          # KW_dunn letters
-library(rcompanion)    # KW_dunn letters
+library(ggplot2)
+library(reshape2)
+library(tidyverse)
+library(phytools)
+library(phyloseq)
+library(RColorBrewer)
+library(microbiome)
+library(microeco)
+library(microViz)
+library(DECIPHER)
+library(phangorn)
+library(decontam)
+library(patchwork)
+library(file2meco)
+library(DESeq2)
+library(GUniFrac)
+library(hillR)
+library(FSA)
+library(rcompanion)
 library(dplyr)
 library(ggridges)
 library(tibble)
 library(scales)
+library(knitr)
 
-# setwd("~/Library/CloudStorage/OneDrive-UniversityofthePhilippines/Vitor Column Sequences")
+# --- THEME DEFINITION (Makie-inspired) ---
+# colors = [:crimson, :steelblue, :forestgreen, :darkorange, :darkgrey]
+makie_colors <- c(
+  "Column 1" = "#DC143C", # Crimson hex
+  "Column 2" = "#4682B4", # Steelblue hex
+  "Column 3" = "#228B22", # Forestgreen hex
+  "Column 4" = "#FF8C00", # Darkorange hex
+  "Control"  = "#A9A9A9"  # Darkgrey hex
+)
+
+theme_makie <- function() {
+  theme_classic(base_size = 11) +
+    theme(
+      text = element_text(family = "Helvetica"),
+      plot.title = element_text(size = 10, face = "plain", hjust = 0),
+      plot.title.position = "plot",
+      axis.title = element_text(size = 9),
+      axis.text = element_text(size = 8),
+      axis.ticks.length = unit(3, "pt"),
+      axis.line = element_line(linewidth = 1.2),
+      panel.grid = element_blank(),
+      strip.background = element_blank(),
+      strip.text = element_text(size = 9, face = "bold"),
+      legend.title = element_text(size = 8),
+      legend.text = element_text(size = 9),
+      legend.key.size = unit(10, "pt"),
+      legend.margin = margin(2, 2, 2, 2)
+    )
+}
+
 
 
 ####LOAD DATA####
@@ -388,7 +413,7 @@ ps_16S_sediments_rar %>%
   labs(y = "Relative abundance (%)") + 
   guides(fill = guide_legend(reverse = TRUE)) -> plot_1.2
 
-# once you give it a name (plot_1.1) you can call on this plot whenever you want
+
 plot_1.2
 
 
@@ -454,7 +479,7 @@ ps_fuhrberg <- prune_taxa(taxa_sums(ps_fuhrberg) > 0, ps_fuhrberg)
 
 # 2) rarefy (choose sample.size based on Fuhrberg min depth)
 min(sample_sums(ps_fuhrberg))
-ps_fuhrberg_rar <- rarefy_even_depth(ps_fuhrberg, sample.size = 1500,
+ps_fuhrberg_rar <- rarefy_even_depth(ps_fuhrberg, sample.size = 3000,
                                      rngseed = 123, replace = TRUE,
                                      trimOTUs = TRUE, verbose = TRUE)
 
@@ -505,29 +530,28 @@ sd$sample_id <- rownames(sd)
 
 sd <- sd %>%
   mutate(sample_label = case_when(
-    sample_id == "JMF-2511-04-0034" ~ "Control – Inlet",
-    sample_id == "JMF-2511-04-0039" ~ "Control – Outlet",
-    
-    sample_id == "JMF-2511-04-0031" ~ "Column 1 – Inlet",
-    sample_id == "JMF-2511-04-0032" ~ "Column 2 – Inlet",
-    sample_id == "JMF-2511-04-0033" ~ "Column 3 – Inlet",
-    
-    sample_id == "JMF-2511-04-0036" ~ "Column 1 – Outlet",
-    sample_id == "JMF-2511-04-0037" ~ "Column 2 – Outlet",
-    sample_id == "JMF-2511-04-0038" ~ "Column 3 – Outlet",  # <-- change this to the correct ID for Column 3 outlet
-    
+    sample_id == "JMF-2511-04-0034" ~ "Control – Inlet (0-4cm)",
+    sample_id == "JMF-2511-04-0039" ~ "Control – Outlet (4-8cm)",
+
+    sample_id == "JMF-2511-04-0031" ~ "Column 1 – Inlet (0-4cm)",
+    sample_id == "JMF-2511-04-0032" ~ "Column 2 – Inlet (0-4cm)",
+    sample_id == "JMF-2511-04-0033" ~ "Column 3 – Inlet (0-4cm)",
+
+    sample_id == "JMF-2511-04-0036" ~ "Column 1 – Outlet (4-8cm)",
+    sample_id == "JMF-2511-04-0037" ~ "Column 2 – Outlet (4-8cm)",
+    sample_id == "JMF-2511-04-0038" ~ "Column 3 – Outlet (4-8cm)",  # <-- change this to the correct ID for Column 3 outlet
+
     TRUE ~ as.character(sd$sample_type)
   ))
-
 sample_data(ps_fuhrberg)$sample_label <- sd$sample_label
 
 sample_data(ps_fuhrberg)$sample_label <- factor(
   sample_data(ps_fuhrberg)$sample_label,
   levels = c(
-    "Control – Inlet", "Control – Outlet",
-    "Column 1 – Inlet", "Column 1 – Outlet",
-    "Column 2 – Inlet", "Column 2 – Outlet",
-    "Column 3 – Inlet", "Column 3 – Outlet"
+    "Control – Inlet (0-4cm)", "Control – Outlet (4-8cm)",
+    "Column 1 – Inlet (0-4cm)", "Column 1 – Outlet (4-8cm)",
+    "Column 2 – Inlet (0-4cm)", "Column 2 – Outlet (4-8cm)",
+    "Column 3 – Inlet (0-4cm)", "Column 3 – Outlet (4-8cm)"
   )
 )
 
@@ -567,94 +591,135 @@ pA
 
 
 ## =========================
-## 1) Family composition (counts preserved; percent axis)
+## Family composition (same order as heatmap, no Mitochondria)
 ## =========================
-# Uses comp_barplot(); if your comp_barplot has no `x=` argument, see fallback below.
 
-pB <- ps_fuhrberg %>%
+# enforce the exact order used in the heatmap
+sample_data(ps_fuhrberg)$sample_label <- factor(
+  sample_data(ps_fuhrberg)$sample_label,
+  levels = c(
+    "Control – Inlet (0-4cm)", "Column 1 – Inlet (0-4cm)", "Column 2 – Inlet (0-4cm)", "Column 3 – Inlet (0-4cm)",
+    "Control – Outlet (4-8cm)", "Column 1 – Outlet (4-8cm)", "Column 2 – Outlet (4-8cm)", "Column 3 – Outlet (4-8cm)"
+  )
+)
+
+# remove unwanted taxa first
+ps_fuhrberg_no_mito <- subset_taxa(
+  ps_fuhrberg,
+  Domain == "Bacteria" &
+    !Order %in% c("Chloroplast") &
+    !Family %in% c(
+      "Bacteria Domain", "Sericytochromatia Class", "Kapabacteriales Order",
+      "mle1-27 Order", "053A03-B-DI-P58 Order", "Lineage IV Order"
+    )
+)
+
+# make sure sample metadata has the needed variables
+sd <- data.frame(sample_data(ps_fuhrberg_no_mito))
+sd$sample_id <- rownames(sd)
+
+# derivation of column and position from sample_label
+sd$column <- dplyr::case_when(
+  grepl("^Control",  sd$sample_label) ~ "Control",
+  grepl("^Column 1", sd$sample_label) ~ "Column 1",
+  grepl("^Column 2", sd$sample_label) ~ "Column 2",
+  grepl("^Column 3", sd$sample_label) ~ "Column 3",
+  TRUE ~ NA_character_
+)
+
+sd$position <- ifelse(grepl("Inlet", sd$sample_label), "Inlet (0-4cm)", "Outlet (4-8cm)")
+
+sd$column <- factor(sd$column, levels = c("Control", "Column 1", "Column 2", "Column 3"))
+sd$position <- factor(sd$position, levels = c("Inlet (0-4cm)", "Outlet (4-8cm)"))
+
+sample_data(ps_fuhrberg_no_mito)$column <- sd$column
+sample_data(ps_fuhrberg_no_mito)$position <- sd$position
+sample_data(ps_fuhrberg_no_mito)$sample_label <- factor(
+  sd$sample_label,
+  levels = c(
+    "Control – Inlet (0-4cm)", "Column 1 – Inlet (0-4cm)", "Column 2 – Inlet (0-4cm)", "Column 3 – Inlet (0-4cm)",
+    "Control – Outlet (4-8cm)", "Column 1 – Outlet (4-8cm)", "Column 2 – Outlet (4-8cm)", "Column 3 – Outlet (4-8cm)"
+  )
+)
+
+# reorder samples in the phyloseq object based on sample_label
+sample_order <- rownames(data.frame(sample_data(ps_fuhrberg_no_mito)))[
+  order(sample_data(ps_fuhrberg_no_mito)$sample_label)
+]
+
+ps_fuhrberg_ordered <- prune_samples(sample_order, ps_fuhrberg_no_mito)
+
+# quick check of valid sample variables
+sample_variables(ps_fuhrberg_ordered)
+
+# family barplot with inlet/outlet separation
+pB <- ps_fuhrberg_ordered %>%
   comp_barplot(
     tax_level = "Family",
     n_taxa = 30,
-    x = "sample_label",
+    x = "column",
+    facet_by = "position",
     other_name = "Other family",
     merge_other = FALSE,
     bar_width = 0.9,
     bar_outline_colour = "grey20"
   ) +
-  scale_y_continuous(labels = percent_format(accuracy = 1)) +
-  labs(x = NULL, y = "Relative abundance (%)", title = "Community composition (Family)") +
-  theme_minimal(base_size = 11) +
-  theme(
-    panel.grid = element_blank(),
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    legend.position = "right",
-    plot.title = element_text(face = "bold")
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(
+    x = NULL,
+    y = "Relative abundance (%)",
+    title = "a. Family Composition"
   ) +
-  guides(fill = guide_legend(reverse = TRUE))
+  theme_makie() +
+  theme(
+    axis.text.x = element_text(angle = 30, hjust = 1, vjust = 1),
+    legend.position = "right",
+    legend.text = element_text(size = 7, face = "italic"),
+    legend.key.size = unit(8, "pt")
+  ) +
+  guides(fill = guide_legend(reverse = TRUE, ncol = 1))
 
 pB
 
 
+## =========================
+## Mean and SD of Family relative abundance
+## =========================
 
-library(phyloseq)
-library(dplyr)
-library(tibble)
-library(ggplot2)
+# Agglomerate to Family level
+ps_fuhrberg_family_rel <- tax_glom(ps_fuhrberg_rel, taxrank = "Family", NArm = TRUE)
+
+# Convert to long format
+fam_rel_df <- psmelt(ps_fuhrberg_family_rel) %>%
+  filter(!is.na(Family))
+
+# Calculate mean and SD across all samples
+fam_mean_sd <- fam_rel_df %>%
+  group_by(Family) %>%
+  summarise(
+    mean_relative_abundance = mean(Abundance, na.rm = TRUE),
+    sd_relative_abundance   = sd(Abundance, na.rm = TRUE),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    mean_percent = mean_relative_abundance * 100,
+    sd_percent   = sd_relative_abundance * 100
+  ) %>%
+  arrange(desc(mean_percent))
+
+# View top families
+head(fam_mean_sd, 30)
+
+############## Heatmap #############
 
 stopifnot("sample_label" %in% sample_variables(ps_fuhrberg))
 
-# -----------------------------
-# Move Metadata Enrichment Here (before Heatmap)
-# -----------------------------
-sd <- data.frame(sample_data(ps_fuhrberg))
-sd$sample_id <- rownames(sd)
-
-sd <- sd %>%
-  mutate(
-    sample_label = case_when(
-      sample_id == "JMF-2511-04-0034" ~ "Column 4 – 0-4 cm",
-      sample_id == "JMF-2511-04-0039" ~ "Column 4 – 4-8 cm",
-      
-      sample_id == "JMF-2511-04-0031" ~ "Column 1 – 0-4 cm",
-      sample_id == "JMF-2511-04-0032" ~ "Column 2 – 0-4 cm",
-      sample_id == "JMF-2511-04-0033" ~ "Column 3 – 0-4 cm",
-      
-      sample_id == "JMF-2511-04-0036" ~ "Column 1 – 4-8 cm",
-      sample_id == "JMF-2511-04-0037" ~ "Column 2 – 4-8 cm",
-      sample_id == "JMF-2511-04-0038" ~ "Column 3 – 4-8 cm",
-      
-      TRUE ~ as.character(sample_type)
-    ),
-    position = ifelse(grepl("0-4 cm", sample_label), "0-4 cm", "4-8 cm"),
-    io_group = position,
-    column = case_when(
-      grepl("^Column 1", sample_label) ~ "Column 1",
-      grepl("^Column 2", sample_label) ~ "Column 2",
-      grepl("^Column 3", sample_label) ~ "Column 3",
-      grepl("^Column 4", sample_label) ~ "Column 4",
-      TRUE ~ NA_character_
-    )
-  )
-
-sd$sample_label <- factor(
-  sd$sample_label,
-  levels = c(
-    "Column 1 – 0-4 cm", "Column 1 – 4-8 cm",
-    "Column 2 – 0-4 cm", "Column 2 – 4-8 cm",
-    "Column 3 – 0-4 cm", "Column 3 – 4-8 cm",
-    "Column 4 – 0-4 cm", "Column 4 – 4-8 cm"
-  )
+# Inlet vs Outlet grouping (optional but matches your request)
+sample_data(ps_fuhrberg)$io_group <- ifelse(
+  grepl("Inlet", as.character(sample_data(ps_fuhrberg)$sample_label)),
+  "Inlet (0-4cm)", "Outlet (4-8cm)"
 )
-sd$position <- factor(sd$position, levels = c("0-4 cm","4-8 cm"))
-sd$io_group <- factor(sd$io_group, levels = c("0-4 cm","4-8 cm"))
-sd$column   <- factor(sd$column, levels = c("Column 1","Column 2","Column 3","Column 4"))
-
-# write back into phyloseq
-sample_data(ps_fuhrberg)$sample_label <- sd$sample_label
-sample_data(ps_fuhrberg)$position     <- sd$position
-sample_data(ps_fuhrberg)$io_group     <- sd$io_group
-sample_data(ps_fuhrberg)$column       <- sd$column
-
+sample_data(ps_fuhrberg)$io_group <- factor(sample_data(ps_fuhrberg)$io_group, levels = c("Inlet (0-4cm)", "Outlet (4-8cm)"))
 
 # 1) Agglomerate to Family
 ps_fam <- tax_glom(ps_fuhrberg, taxrank = "Family", NArm = TRUE)
@@ -662,12 +727,11 @@ ps_fam <- tax_glom(ps_fuhrberg, taxrank = "Family", NArm = TRUE)
 # 2) Relative abundance
 ps_fam_rel <- transform_sample_counts(ps_fam, function(x) x / sum(x))
 
-# 3) Long format + attach sample_label + io_group + column
+# 3) Long format + attach sample_label + io_group
 df <- psmelt(ps_fam_rel) %>%
   mutate(
     sample_label = sample_data(ps_fuhrberg)$sample_label[match(Sample, sample_names(ps_fuhrberg))],
-    io_group     = sample_data(ps_fuhrberg)$io_group[match(Sample, sample_names(ps_fuhrberg))],
-    column       = sample_data(ps_fuhrberg)$column[match(Sample, sample_names(ps_fuhrberg))]
+    io_group     = sample_data(ps_fuhrberg)$io_group[match(Sample, sample_names(ps_fuhrberg))]
   ) %>%
   filter(Family != "Mitochondria")
 
@@ -682,7 +746,7 @@ top_fams <- df %>%
 
 df2 <- df %>%
   mutate(Family2 = ifelse(Family %in% top_fams, as.character(Family), "Other family")) %>%
-  group_by(sample_label, column, Family2) %>%
+  group_by(sample_label, io_group, Family2) %>%
   summarise(Abundance = sum(Abundance), .groups = "drop") %>%
   mutate(
     sample_label = factor(sample_label, levels = levels(sample_data(ps_fuhrberg)$sample_label)),
@@ -703,7 +767,7 @@ df2$Family2 <- factor(df2$Family2, levels = rev(fam_order))
 p_heat_vals <- ggplot(df2, aes(x = sample_label, y = Family2, fill = pct)) +
   geom_tile(color = "grey85", linewidth = 0.2) +
   geom_text(aes(label = pct_lab), size = 3, color = "black") +
-  facet_grid(. ~ column, scales = "free_x", space = "free_x") +
+  facet_grid(. ~ io_group, scales = "free_x", space = "free_x") +
   scale_fill_gradient(
     low = "white",
     high = "purple",
@@ -730,14 +794,67 @@ p_heat_vals
 # -----------------------------
 # 7) Add sample_label, position, io_group, column  (CRITICAL for microeco)
 # -----------------------------
-# ALREADY DONE ABOVE - logic moved before heatmap
+sd <- data.frame(sample_data(ps_fuhrberg))
+sd$sample_id <- rownames(sd)
+
+sd <- sd %>%
+  mutate(
+    sample_label = case_when(
+          sample_id == "JMF-2511-04-0034" ~ "Control – Inlet (0-4cm)",
+          sample_id == "JMF-2511-04-0039" ~ "Control – Outlet (4-8cm)",
+
+          sample_id == "JMF-2511-04-0031" ~ "Column 1 – Inlet (0-4cm)",
+          sample_id == "JMF-2511-04-0032" ~ "Column 2 – Inlet (0-4cm)",
+          sample_id == "JMF-2511-04-0033" ~ "Column 3 – Inlet (0-4cm)",
+
+          sample_id == "JMF-2511-04-0036" ~ "Column 1 – Outlet (4-8cm)",
+          sample_id == "JMF-2511-04-0037" ~ "Column 2 – Outlet (4-8cm)",
+          sample_id == "JMF-2511-04-0038" ~ "Column 3 – Outlet (4-8cm)",
+
+          TRUE ~ as.character(sample_type)
+        )
+,
+    position = factor(ifelse(grepl("Inlet", sample_label), "Inlet (0-4cm)", "Outlet (4-8cm)"), levels = c("Inlet (0-4cm)","Outlet (4-8cm)")),
+    io_group = position,
+    column = case_when(
+      grepl("^Control",  sample_label) ~ "Control",
+      grepl("^Column 1", sample_label) ~ "Column 1",
+      grepl("^Column 2", sample_label) ~ "Column 2",
+      grepl("^Column 3", sample_label) ~ "Column 3",
+      TRUE ~ NA_character_
+    )
+  )
+
+sd$sample_label <- factor(
+  sd$sample_label,
+  levels = c(
+    "Control – Inlet (0-4cm)", "Control – Outlet (4-8cm)",
+    "Column 1 – Inlet (0-4cm)", "Column 1 – Outlet (4-8cm)",
+    "Column 2 – Inlet (0-4cm)", "Column 2 – Outlet (4-8cm)",
+    "Column 3 – Inlet (0-4cm)", "Column 3 – Outlet (4-8cm)"
+  )
+)
+sd$position <- factor(sd$position, levels = c("Inlet (0-4cm)","Outlet (4-8cm)"))
+sd$io_group <- factor(sd$io_group, levels = c("Inlet (0-4cm)","Outlet (4-8cm)"))
+sd$column   <- factor(sd$column, levels = c("Control","Column 1","Column 2","Column 3"))
+
+# write back into phyloseq
+sample_data(ps_fuhrberg)$sample_label <- sd$sample_label
+sample_data(ps_fuhrberg)$position     <- sd$position
+sample_data(ps_fuhrberg)$io_group     <- sd$io_group
+sample_data(ps_fuhrberg)$column       <- sd$column
+
+# sanity
+stopifnot("sample_label" %in% sample_variables(ps_fuhrberg))
+stopifnot("position" %in% sample_variables(ps_fuhrberg))
+stopifnot("column" %in% sample_variables(ps_fuhrberg))
 
 # -----------------------------
 # 8) Rarefy + relative abundance objects (FROM LABELED ps_fuhrberg)
 # -----------------------------
 set.seed(123)
 ps_fuhrberg_rar <- rarefy_even_depth(
-  ps_fuhrberg, sample.size = 1500,
+  ps_fuhrberg, sample.size = 3000,
   rngseed = 123, replace = TRUE,
   trimOTUs = TRUE, verbose = TRUE
 )
@@ -771,14 +888,14 @@ t_alpha$res_diff %>% knitr::kable()
 
 # palettes
 col_palette <- c(
-  "Column 4" = "red",
+  "Control"  = "red",
   "Column 1" = "blue",
   "Column 2" = "gold",
   "Column 3" = "darkgreen"
 )
 
 # box/outline same for both positions (and hide legend)
-pos_outline <- c("0-4 cm" = "grey30", "4-8 cm" = "grey30")
+pos_outline <- c("Inlet (0-4cm)" = "grey30", "Outlet (4-8cm)" = "grey30")
 
 # ---- Build base plots FIRST (so $data exists) ----
 p_alpha_chao_base <- t_alpha$plot_alpha(
@@ -795,7 +912,6 @@ p_alpha_shan_base <- t_alpha$plot_alpha(
 
 # ---- Now add the jitter points using the base plot data ----
 p_alpha_chao <- p_alpha_chao_base +
-  scale_color_manual(values = pos_outline, guide = "none") +
   geom_jitter(
     data = p_alpha_chao_base$data,
     aes(x = position, y = Value, fill = column),
@@ -806,16 +922,12 @@ p_alpha_chao <- p_alpha_chao_base +
     stroke = 0.25,
     inherit.aes = FALSE
   ) +
-  scale_fill_manual(values = col_palette, name = NULL) +
-  theme_classic(base_size = 11) +
-  theme(
-    legend.position = "bottom",
-    axis.line = element_line(color = "black"),
-    plot.title = element_text(face = "bold")
-  )
+  scale_fill_manual(values = makie_colors, name = NULL) +
+  scale_color_manual(values = pos_outline, guide = "none") +
+  labs(title = "Chao1 Index") +
+  theme_makie()
 
 p_alpha_shan <- p_alpha_shan_base +
-  scale_color_manual(values = pos_outline, guide = "none") +
   geom_jitter(
     data = p_alpha_shan_base$data,
     aes(x = position, y = Value, fill = column),
@@ -826,13 +938,10 @@ p_alpha_shan <- p_alpha_shan_base +
     stroke = 0.25,
     inherit.aes = FALSE
   ) +
-  scale_fill_manual(values = col_palette, name = NULL) +
-  theme_classic(base_size = 11) +
-  theme(
-    legend.position = "bottom",
-    axis.line = element_line(color = "black"),
-    plot.title = element_text(face = "bold")
-  )
+  scale_fill_manual(values = makie_colors, name = NULL) +
+  scale_color_manual(values = pos_outline, guide = "none") +
+  labs(title = "Shannon Index") +
+  theme_makie()
 
 p_alpha <- (p_alpha_shan + p_alpha_chao) +
   plot_layout(guides = "collect") &
@@ -852,6 +961,8 @@ meta <- data.frame(sample_data(ps_fuhrberg_rel))
 meta$Sample <- rownames(meta)
 
 bray <- vegdist(otu_rel, method = "bray")
+
+metaMDS(bray)
 
 adon_col <- adonis2(bray ~ column, data = meta, permutations = 9999)
 print(adon_col)
@@ -873,72 +984,245 @@ var_expl <- pcoa$eig / sum(pcoa$eig)
 var_expl <- var_expl[1:2]
 
 ord_df2 <- ord_df %>%
-  mutate(position = factor(position, levels = c("0-4 cm", "4-8 cm"))) %>%
+  mutate(position = factor(position, levels = c("Inlet (0-4cm)", "Outlet (4-8cm)"))) %>%
   arrange(column, position)
 
 p_beta_pcoa <- ggplot(ord_df2, aes(PCoA1, PCoA2)) +
   geom_path(aes(group = column, color = column),
-            linewidth = 0.8, alpha = 0.9, show.legend = FALSE) +
+            linewidth = 0.8, alpha = 0.6, show.legend = FALSE) +
   geom_point(aes(fill = column, shape = position),
              size = 3.2, color = "black", stroke = 0.3) +
-  scale_fill_manual(values = col_palette, name = NULL) +
-  scale_color_manual(values = col_palette, guide = "none") +
-  scale_shape_manual(values = c("0-4 cm" = 21, "4-8 cm" = 24), name = NULL) +
+  scale_fill_manual(values = makie_colors, name = NULL) +
+  scale_color_manual(values = makie_colors, guide = "none") +
+  scale_shape_manual(values = c("Inlet (0-4cm)" = 21, "Outlet (4-8cm)" = 24), name = NULL) +
   guides(fill = guide_legend(override.aes = list(shape = 21, color = NA))) +
   labs(
     title = "Beta diversity (Bray–Curtis PCoA)",
     x = paste0("PCoA1 (", round(100 * var_expl[1], 1), "%)"),
     y = paste0("PCoA2 (", round(100 * var_expl[2], 1), "%)")
   ) +
-  theme_classic(base_size = 11) +
-  theme(
-    legend.position = "bottom",
-    axis.line = element_line(color = "black"),
-    plot.title = element_text(face = "bold", hjust = 0),
-    plot.title.position = "plot"
-  )
+  theme_makie() +
+  theme(legend.position = "bottom")
 
 p_beta_pcoa
 
+
+############################################################
+## DESeq2 analysis for Fuhrberg columns
+## Family level
+############################################################
+
+library(phyloseq)
+library(DESeq2)
+library(dplyr)
+library(tibble)
+library(knitr)
+
+############################################################
+## 1) Start from Fuhrberg phyloseq object
+##    Assumes ps_fuhrberg already exists
+############################################################
+
+# Agglomerate to Family level
+ps_family <- tax_glom(ps_fuhrberg, taxrank = "Family", NArm = TRUE)
+
+# Optional: remove very low-count families
+ps_family <- prune_taxa(taxa_sums(ps_family) > 10, ps_family)
+
+############################################################
+## 2) Build metadata variables from sample_label
+############################################################
+
+meta <- data.frame(sample_data(ps_family))
+meta$Sample <- rownames(meta)
+
+# If column is not already present, derive it
+if (!"column" %in% colnames(meta)) {
+  meta$column <- case_when(
+    grepl("^Control", meta$sample_label)  ~ "Control",
+    grepl("^Column 1", meta$sample_label) ~ "Column 1",
+    grepl("^Column 2", meta$sample_label) ~ "Column 2",
+    grepl("^Column 3", meta$sample_label) ~ "Column 3",
+    TRUE ~ NA_character_
+  )
+}
+
+# If treatment is not already present, derive it
+if (!"treatment" %in% colnames(meta)) {
+  meta$treatment <- ifelse(meta$column == "Control", "Control", "Nitrate-fed")
+}
+
+# Make factors with explicit order
+meta$column <- factor(
+  meta$column,
+  levels = c("Control", "Column 1", "Column 2", "Column 3")
+)
+
+meta$treatment <- factor(
+  meta$treatment,
+  levels = c("Control", "Nitrate-fed")
+)
+
+meta$position <- factor(
+  meta$position,
+  levels = c("Inlet (0-4cm)", "Outlet (4-8cm)")
+)
+
+# Write back into phyloseq
+sample_data(ps_family)$column <- meta$column
+sample_data(ps_family)$treatment <- meta$treatment
+sample_data(ps_family)$position <- meta$position
+
+# Check
+sample_variables(ps_family)
+table(data.frame(sample_data(ps_family))$treatment, useNA = "ifany")
+table(data.frame(sample_data(ps_family))$position, useNA = "ifany")
+table(data.frame(sample_data(ps_family))$column, useNA = "ifany")
+
+############################################################
+## 3) DESeq2: Control vs Nitrate-fed
+############################################################
+
+dds_treatment <- phyloseq_to_deseq2(ps_family, ~ treatment)
+
+dds_treatment <- DESeq(dds_treatment, fitType = "parametric")
+
+res_treatment <- results(
+  dds_treatment,
+  contrast = c("treatment", "Nitrate-fed", "Control")
+)
+
+res_treatment <- as.data.frame(res_treatment)
+res_treatment$taxon_id <- rownames(res_treatment)
+
+############################################################
+## 4) DESeq2: Inlet vs Outlet
+############################################################
+
+dds_position <- phyloseq_to_deseq2(ps_family, ~ position)
+
+dds_position <- DESeq(dds_position, fitType = "parametric")
+
+res_position <- results(
+  dds_position,
+  contrast = c("position", "Outlet (4-8cm)", "Inlet (0-4cm)")
+)
+
+res_position <- as.data.frame(res_position)
+res_position$taxon_id <- rownames(res_position)
+
+############################################################
+## 5) Add taxonomy to results
+############################################################
+
+tax_df <- as.data.frame(tax_table(ps_family))
+tax_df$taxon_id <- rownames(tax_df)
+
+res_treatment_annot <- left_join(res_treatment, tax_df, by = "taxon_id")
+res_position_annot  <- left_join(res_position,  tax_df, by = "taxon_id")
+
+############################################################
+## 6) Significant results
+############################################################
+
+sig_treatment <- res_treatment_annot %>%
+  filter(!is.na(padj), padj < 0.05) %>%
+  arrange(padj)
+
+sig_position <- res_position_annot %>%
+  filter(!is.na(padj), padj < 0.05) %>%
+  arrange(padj)
+
+############################################################
+## 7) View top results
+############################################################
+
+# Top taxa enriched in nitrate-fed (log2FoldChange)
+sig_treatment %>%
+  arrange(desc(log2FoldChange)) %>%
+  select(Family, log2FoldChange, pvalue, padj) %>%
+  head(40) %>%
+  knitr::kable()
+
+
+# Top taxa enriched in outlet (log2FoldChange)
+sig_position %>%
+  arrange(desc(log2FoldChange)) %>%
+  select(Family, log2FoldChange, pvalue, padj) %>%
+  head(40) %>%
+  knitr::kable()
+
+############################################################
+## 8) export results
+############################################################
+write.csv(sig_treatment,
+          "data/processed_results/DESeq2_Fuhrberg_treatment_family_significant.csv",
+          row.names = FALSE)
+
+write.csv(sig_position,
+          "data/processed_results/DESeq2_Fuhrberg_position_family_significant.csv",
+          row.names = FALSE)
+
+############################################################
+## 9) Deseq plot
+############################################################
+
+
+deseq_plot_top <- sig_treatment %>%
+  filter(!is.na(Family), !Family %in% c("Bacteria Domain", "Sericytochromatia Class", "Kapabacteriales Order", "mle1-27 Order",
+                                        "053A03-B-DI-P58 Order", "053A03-B-DI-P58 Order", "Lineage IV Order", "MA-28-I98C", "Candidatus Lloydbacteria Order",
+                                        "Bacteriovoracaceae", "Nocardiaceae", "Bacteroidetes BD2-2",
+                                        "Lentimicrobiaceae")) %>%
+  slice_max(order_by = abs(log2FoldChange), n = 30) %>%
+  mutate(
+    direction = ifelse(log2FoldChange > 0, "Nitrate-fed", "Control")
+  ) %>%
+  arrange(log2FoldChange)
+
+deseq_plot_top$Family <- factor(deseq_plot_top$Family, levels = deseq_plot_top$Family)
+
+# Shorten long family names for the y-axis
+shorten_label <- function(x, n = 10) {
+  ifelse(nchar(x) > n, paste0(substr(x, 1, n - 1), "."), x)
+}
+
+p_deseq_bar_top <- ggplot(deseq_plot_top, aes(x = log2FoldChange, y = Family, fill = direction)) +
+  geom_col(color = "black", width = 0.75) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "grey30") +
+  scale_fill_manual(
+    values = c("Control" = "#4d9078", "Nitrate-fed" = "#4d9078"),
+  ) +
+  scale_x_continuous(limits = c(-10, 10)) +
+  scale_y_discrete(labels = shorten_label) +
+  labs(
+    x = "Log2 Fold Change",
+    y = NULL,
+    title = "b. Differential Abundance (Nitrate-fed vs Control)"
+  ) +
+  theme_makie() +
+  theme(
+    legend.position = "none",
+    axis.text.y = element_text(face = "italic")
+  )
+
+p_deseq_bar_top
+
+
+p_combined <- pB / p_deseq_bar_top +
+  plot_layout(heights = c(1.8, 1))
+
+p_combined
+
 #### SAVE PLOTS ####
 
-# plot_1.1 (Double column width)
-ggsave("figs/plot_1.1.png", plot = plot_1.1, width = 174, height = 140, units = "mm", dpi = 600)
-ggsave("figs/plot_1.1.pdf", plot = plot_1.1, width = 174, height = 140, units = "mm")
-#ggsave("figs/plot_1.1.eps", plot = plot_1.1, width = 174, height = 140, units = "mm") # Recommended format
-
-# plot_1.2 (Double column width)
-ggsave("figs/plot_1.2.png", plot = plot_1.2, width = 174, height = 140, units = "mm", dpi = 600)
-ggsave("figs/plot_1.2.pdf", plot = plot_1.2, width = 174, height = 140, units = "mm")
-#ggsave("figs/plot_1.2.eps", plot = plot_1.2, width = 174, height = 140, units = "mm")
-
-# plot_fuhrberg (Double column width)
-ggsave("figs/plot_fuhrberg.png", plot = plot_fuhrberg, width = 174, height = 140, units = "mm", dpi = 600)
-ggsave("figs/plot_fuhrberg.pdf", plot = plot_fuhrberg, width = 174, height = 140, units = "mm")
-#ggsave("figs/plot_fuhrberg.eps", plot = plot_fuhrberg, width = 174, height = 140, units = "mm")
-
-# pA (Double column width)
-ggsave("figs/pA.png", plot = pA, width = 174, height = 140, units = "mm", dpi = 600)
-ggsave("figs/pA.pdf", plot = pA, width = 174, height = 140, units = "mm")
-#ggsave("figs/pA.eps", plot = pA, width = 174, height = 140, units = "mm")
-
-# pB (Double column width - slightly shorter to accommodate aspect ratio)
-ggsave("figs/pB.png", plot = pB, width = 174, height = 120, units = "mm", dpi = 600)
-ggsave("figs/pB.pdf", plot = pB, width = 174, height = 120, units = "mm")
-#ggsave("figs/pB.eps", plot = pB, width = 174, height = 120, units = "mm")
-
-# p_heat_vals
-# Max 174mm width, max height 234mm. Set to 228mm (~9 inches).
-ggsave("figs/p_heat_vals.png", plot = p_heat_vals, width = 174, height = 228, units = "mm", dpi = 600)
-ggsave("figs/p_heat_vals.pdf", plot = p_heat_vals, width = 174, height = 228, units = "mm")
-#ggsave("figs/p_heat_vals.eps", plot = p_heat_vals, width = 174, height = 228, units = "mm")
-
 # p_alpha (Double column width, shorter height)
+ggsave("figs/p_alpha.pdf", plot = p_alpha, width = 174, height = 100, units = "mm", device = cairo_pdf)
 ggsave("figs/p_alpha.png", plot = p_alpha, width = 174, height = 100, units = "mm", dpi = 600)
-ggsave("figs/p_alpha.pdf", plot = p_alpha, width = 174, height = 100, units = "mm")
-#ggsave("figs/p_alpha.eps", plot = p_alpha, width = 174, height = 100, units = "mm")
 
-# p_beta_pcoa (1.5 column width since it's a simpler scatter plot)
+# p_beta_pcoa (1.5 column width)
+ggsave("figs/p_beta_pcoa.pdf", plot = p_beta_pcoa, width = 129, height = 100, units = "mm", device = cairo_pdf)
 ggsave("figs/p_beta_pcoa.png", plot = p_beta_pcoa, width = 129, height = 100, units = "mm", dpi = 600)
-ggsave("figs/p_beta_pcoa.pdf", plot = p_beta_pcoa, width = 129, height = 100, units = "mm")
-#ggsave("figs/p_beta_pcoa.eps", plot = p_beta_pcoa, width = 129, height = 100, units = "mm")
+
+# p_combined (Double column width, adjusted height)
+ggsave("figs/p_combined.pdf", plot = p_combined, width = 174, height = 180, units = "mm", device = cairo_pdf)
+ggsave("figs/p_combined.png", plot = p_combined, width = 174, height = 180, units = "mm", dpi = 600)

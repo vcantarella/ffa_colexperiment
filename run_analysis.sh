@@ -30,7 +30,7 @@ julia --project=. scripts/export_to_excel.jl
 
 echo "Running biomolecular analysis (R)..."
 if command -v Rscript >/dev/null 2>&1; then
-    Rscript scripts/"Fuhrberg column analysis_Vitor.R"
+    Rscript scripts/"biofunctional_analysis.R"
 else
     echo "Warning: Rscript not found. Skipping biomolecular analysis."
 fi
@@ -47,8 +47,18 @@ if command -v pdftops >/dev/null 2>&1; then
         pdftops -eps -level3 "$pdf_file" "$eps_file"
     done
     echo "Conversion complete."
+    # 4. Rename the .eps files that go in the final manuscript.
+    echo "Renaming .eps files that go in the manuscript"
+    mv figs/comparison_full_profile.eps figs/figure_5.eps
+    mv figs/p_combined.eps figs/figure_3.eps
+    mv figs/solid_phase_barplots.eps figs/figure_2.eps
+    mv figs/outflow_plot.eps figs/figure_1.eps
+    mv figs/nitrate_and_rates.eps figs/figure_4.eps
+    
 else
     echo "Warning: pdftops (poppler) not found. Skipping EPS conversion."
 fi
+
+
 
 echo "--- Analysis pipeline completed successfully ---"

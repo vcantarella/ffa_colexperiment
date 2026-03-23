@@ -1,0 +1,2 @@
+"baseMean","log2FoldChange","lfcSE","stat","pvalue","padj","taxon_id","Domain","Phylum","Class","Order","Family","Genus"
+108.92898782505,-3.86992382128141,0.942014428035114,-4.10813646384741,3.98864419290447e-05,0.00402853063483351,"ASV_3ug_3c4","Bacteria","Pseudomonadota","Gammaproteobacteria","Burkholderiales","Burkholderiaceae",NA
