@@ -149,11 +149,11 @@ meanFe_S = mean(df_ratios[!, "Fe/S"])
 
 # Plot results in a Figure.
 fig = Figure(size = (493, 422))
-axtoc = Axis(fig[1, 1], title = "a. TOC",
-    ylabel = "TOC [mol kg⁻¹]",
+axtoc = Axis(fig[1, 1], title = "a. SOC",
+    ylabel = "SOC [mol kg⁻¹]",
     )
-axs = Axis(fig[1, 2], title = "b. total Sulfur",
-    ylabel = "total S [mol kg⁻¹]",
+axs = Axis(fig[1, 2], title = "b. Total Sulfur",
+    ylabel = "TS [mol kg⁻¹]",
     #yticks = 0:50:300
     )
 axtic = Axis(fig[1, 3], title = "c. TIC",

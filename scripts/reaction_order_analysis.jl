@@ -171,6 +171,9 @@ lines!(ax_a, xr_z, k0 .* xr_z,
     color = :black, linestyle = :dash, label = "Linear fit")
 text!(ax_a, 0.05, 0.92, text = "R² = $(round(R2_0, digits=3))",
     space = :relative, fontsize = 11)
+text!(ax_a, 0.05, 0.82, text = "r₀ = $(round(k0, digits = 3)) mmol L⁻¹ day⁻¹",
+    space = :relative, fontsize = 11)
+
 
 xr_f = collect(range(0, maximum(x_f) * 1.05, length = 100))
 lines!(ax_b, xr_f, k1 .* xr_f,
